@@ -1,0 +1,10 @@
+inherit_gem:
+  sbmt-dev: config/rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 2.7
+  TargetRailsVersion: 6.0
+
+Rails/OverridingEnvVars:
+  Exclude:
+    - spec/spec_helper.rb
