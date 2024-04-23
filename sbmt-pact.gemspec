@@ -31,12 +31,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "zeitwerk", "~> 2.3"
-  spec.add_dependency "pact-ffi", "~> 0.0.3"
-  spec.add_dependency "ffi", "~> 1.15"
+  spec.add_dependency "pact-ffi", "~> 0.0.3.1"
 
   spec.add_development_dependency "appraisal", ">= 2.4"
   spec.add_development_dependency "bundler", ">= 2.3"
   spec.add_development_dependency "combustion", ">= 1.3"
   spec.add_development_dependency "rake", ">= 13.0"
-  spec.add_development_dependency "sbmt-dev", ">= 0.1.0"
+  spec.add_development_dependency "sbmt-dev", ">= 0.6.0"
 end

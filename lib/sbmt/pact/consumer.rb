@@ -2,6 +2,7 @@
 
 module Sbmt
   module Pact
-    VERSION = "0.2.0"
+    module Consumer
+    end
   end
 end
