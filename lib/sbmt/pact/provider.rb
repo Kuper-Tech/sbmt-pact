@@ -2,6 +2,7 @@
 
 module Sbmt
   module Pact
-    VERSION = "0.3.0"
+    module Provider
+    end
   end
 end

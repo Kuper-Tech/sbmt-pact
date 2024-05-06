@@ -6,5 +6,9 @@ gemspec
 
 source "https://nexus.sbmt.io/repository/ruby-gems-sbermarket/" do
   gem "pact-ffi"
-  gem "sbmt-dev"
+
+  group :development, :test do
+    gem "sbmt-app"
+    gem "sbmt-dev"
+  end
 end

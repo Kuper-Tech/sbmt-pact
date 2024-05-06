@@ -1,0 +1,21 @@
+syntax = "proto3";
+package pet_store.v1;
+option ruby_package = "PetStore::Grpc::PetStore::V1";
+
+service Pets {
+  rpc PetById (PetByIdRequest) returns (PetResponse);
+}
+
+message Pet {
+  int32 id = 1;
+  string name = 2;
+}
+
+message PetByIdRequest {
+  int32 id = 1;
+}
+
+message PetResponse {
+  Pet pet = 1;
+  map<string, string> metadata = 2;
+}

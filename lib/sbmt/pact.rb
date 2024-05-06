@@ -3,6 +3,8 @@
 require "zeitwerk"
 require "pact/ffi"
 
+require "sbmt/pact/railtie" if defined?(Rails::Railtie)
+
 module Sbmt
   module Pact
     class Error < StandardError; end

@@ -3,6 +3,7 @@
 require "rspec"
 require_relative "rspec/support/pact_matching_helpers"
 require_relative "rspec/support/pact_consumer_helpers"
+require_relative "rspec/support/pact_provider_helpers"
 
 RSpec.configure do |config|
   config.define_derived_metadata(file_path: %r{spec/pact/}) { |metadata| metadata[:type] = :pact }

@@ -2,7 +2,8 @@
 
 require "pact/ffi/sync_message_consumer"
 require "pact/ffi/plugin_consumer"
-require "pact/ffi/logger"
+
+require "sbmt/pact/native/logger"
 
 module Sbmt
   module Pact
@@ -97,28 +98,10 @@ module Sbmt
           handle = PactFfi.new_pact(consumer_name, provider_name)
           PactFfi.with_specification(handle, PactFfi::FfiSpecificationVersion["SPECIFICATION_VERSION_V4"])
           PactFfi.with_pact_metadata(handle, "sbmt-pact", "pact-ffi", PactFfi.version)
-          log_to_stdout(log_level)
-          handle
-        end
 
-        def log_to_stdout(log_level)
-          level = case log_level
-          when :off
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_OFF"]
-          when :error
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_ERROR"]
-          when :warn
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_WARN"]
-          when :info
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_INFO"]
-          when :debug
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_DEBUG"]
-          when :trace
-            PactFfi::FfiLogLevelFilter["LOG_LEVEL_TRACE"]
-          else
-            raise "invalid log level for PactFfi::FfiLogLevelFilter"
-          end
-          PactFfi::Logger.log_to_stdout(level)
+          Sbmt::Pact::Native::Logger.log_to_stdout(log_level)
+
+          handle
         end
 
         def init_plugin!

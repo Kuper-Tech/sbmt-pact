@@ -8,7 +8,7 @@ module Sbmt
       class MockServer
         attr_reader :host, :port, :transport
 
-        TRANSPORT_HTTP = "grpc"
+        TRANSPORT_HTTP = "http"
         TRANSPORT_GRPC = "grpc"
 
         TRANSPORTS = [TRANSPORT_HTTP, TRANSPORT_GRPC].freeze
