@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.3.0] - 2024-05-03
+
+### Added
+- Provider specs base DSL/helpers
+
 ## [0.2.0] - 2024-04-18
 
 ### Added

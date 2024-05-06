@@ -14,6 +14,7 @@ module Sbmt
           @method_name = nil
           @request = nil
           @response = nil
+          @response_meta = nil
         end
 
         def with_service(proto_path, service_name, method_name)
