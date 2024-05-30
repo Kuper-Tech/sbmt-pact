@@ -20,10 +20,24 @@ module Sbmt
           4 => {reason: :invalid_arguments, status: 4, description: "Invalid arguments were provided to the verification process"}
         }.freeze
 
-        def initialize(provider_name:, grpc_server_port: 3009, provider_setup_port: 9001, log_level: :info)
+        # env below are set up by pipeline-builder
+        # see https://gitlab.sbmt.io/paas/cicd/images/pact/pipeline-builder/-/blob/master/internal/commands/consumers-pipeline/ruby.go
+        def initialize(
+          provider_name:, grpc_server_port: 3009, provider_setup_port: 9001, log_level: :info,
+          provider_version: ENV.fetch("PACT_PROVIDER_VERSION", "1.0.0"),
+          consumer_version: ENV.fetch("PACT_CONSUMER_VERSION", "1.0.0"),
+          broker_url: ENV.fetch("PACT_BROKER_URL", nil),
+          broker_username: ENV.fetch("PACT_BROKER_USERNAME", ""),
+          broker_password: ENV.fetch("PACT_BROKER_PASSWORD", "")
+        )
           @provider_name = provider_name
           @grpc_server_port = grpc_server_port
           @provider_setup_port = provider_setup_port
+          @provider_version = provider_version
+          @consumer_version = consumer_version
+          @broker_url = broker_url
+          @broker_username = broker_username
+          @broker_password = broker_password
 
           @provider_state = nil
 
@@ -69,12 +83,10 @@ module Sbmt
           handle = PactFfi::Verifier.new_for_application("sbmt-pact", PactFfi.version)
           PactFfi::Verifier.set_provider_info(handle, @provider_name, "", "", 0, "")
           PactFfi::Verifier.set_provider_state(handle, provider_setup_url, 1, 1)
-          PactFfi::Verifier.set_verification_options(handle, 0, 1000)
-          PactFfi::Verifier.set_publish_options(handle, "1.0.0", "", nil, 0, "")
+          PactFfi::Verifier.set_verification_options(handle, 0, 10000)
+          PactFfi::Verifier.set_publish_options(handle, @provider_version, "", nil, 0, "")
 
-          # TODO: use pact-broker instead of directory source
-          # PactFfi::Verifier.broker_source(pact, PACT_BROKER_URL, PACT_BROKER_USERNAME, PACT_BROKER_PASSWORD, PACT_BROKER_TOKEN)
-          PactFfi::Verifier.add_directory_source(handle, Rails.root.join("pacts").to_s)
+          configure_verification_source(handle)
 
           PactFfi::Verifier.set_no_pacts_is_error(handle, 1)
           PactFfi::Verifier.add_provider_transport(handle, PROVIDER_TRANSPORT_TYPE, @grpc_server_port, "", "")
@@ -92,6 +104,12 @@ module Sbmt
         def start_servers
           @grpc_server.start
           @provider_setup_server.start
+        end
+
+        def configure_verification_source(handle)
+          return PactFfi::Verifier.add_directory_source(handle, Rails.root.join("pacts").to_s) if @broker_url.blank?
+
+          PactFfi::Verifier.broker_source(handle, @broker_url, @broker_username, @broker_password, "")
         end
       end
     end
