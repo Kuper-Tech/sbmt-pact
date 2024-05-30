@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.0] - 2024-05-29
+
+### Added
+- Ability to verify provider specs against pact-broker
+
 ## [0.3.0] - 2024-05-03
 
 ### Added

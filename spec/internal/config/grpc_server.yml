@@ -1,7 +1,7 @@
 default: &default
   binding_url: '0.0.0.0:3009'
   pool_size: 30
-  pool_keep_alive: true
+  pool_keep_alive: 1
 
 development:
   <<: *default
