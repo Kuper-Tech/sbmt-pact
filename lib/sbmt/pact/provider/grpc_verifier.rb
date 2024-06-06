@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "pact/ffi/verifier"
-
 require "sbmt/pact/native/logger"
 
 module Sbmt
@@ -25,6 +24,7 @@ module Sbmt
         def initialize(
           provider_name:, grpc_server_port: 3009, provider_setup_port: 9001, log_level: :info,
           provider_version: ENV.fetch("PACT_PROVIDER_VERSION", "1.0.0"),
+          consumer_branch: ENV.fetch("PACT_CONSUMER_BRANCH", nil),
           consumer_version: ENV.fetch("PACT_CONSUMER_VERSION", "1.0.0"),
           broker_url: ENV.fetch("PACT_BROKER_URL", nil),
           broker_username: ENV.fetch("PACT_BROKER_USERNAME", ""),
@@ -34,6 +34,7 @@ module Sbmt
           @grpc_server_port = grpc_server_port
           @provider_setup_port = provider_setup_port
           @provider_version = provider_version
+          @consumer_branch = consumer_branch
           @consumer_version = consumer_version
           @broker_url = broker_url
           @broker_username = broker_username
@@ -86,7 +87,7 @@ module Sbmt
           PactFfi::Verifier.set_verification_options(handle, 0, 10000)
           PactFfi::Verifier.set_publish_options(handle, @provider_version, "", nil, 0, "")
 
-          configure_verification_source(handle)
+          configure_verification_source(handle, @consumer_branch)
 
           PactFfi::Verifier.set_no_pacts_is_error(handle, 1)
           PactFfi::Verifier.add_provider_transport(handle, PROVIDER_TRANSPORT_TYPE, @grpc_server_port, "", "")
@@ -106,10 +107,15 @@ module Sbmt
           @provider_setup_server.start
         end
 
-        def configure_verification_source(handle)
+        def configure_verification_source(handle, consumer_branch)
           return PactFfi::Verifier.add_directory_source(handle, Rails.root.join("pacts").to_s) if @broker_url.blank?
+          return PactFfi::Verifier.broker_source(handle, @broker_url, @broker_username, @broker_password, nil) if consumer_branch.blank?
 
-          PactFfi::Verifier.broker_source(handle, @broker_url, @broker_username, @broker_password, "")
+          json = JSON.dump(branch: consumer_branch).to_s
+          filters = [FFI::MemoryPointer.from_string(json)]
+          filters_ptr = FFI::MemoryPointer.new(:pointer, filters.size + 1)
+          filters_ptr.write_array_of_pointer(filters)
+          PactFfi::Verifier.broker_source_with_selectors(handle, @broker_url, @broker_username, @broker_password, nil, 0, nil, nil, 0, nil, filters_ptr, filters.size, nil, 0)
         end
       end
     end

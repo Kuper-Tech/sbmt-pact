@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.4.1] - 2024-06-06
+
+### Fixed
+- Use proper consumer version for provider verification
+
 ## [0.4.0] - 2024-05-29
 
 ### Added
