@@ -33,11 +33,11 @@ module Sbmt
           3 => {reason: :mock_server_not_found, status: 3, description: "A mock server with the provided port was not found"}
         }.freeze
 
-        def self.create_grpc(pact:, host: "127.0.0.1", port: 0)
+        def self.create_for_grpc!(pact:, host: "127.0.0.1", port: 0)
           new(pact: pact, transport: TRANSPORT_GRPC, host: host, port: port)
         end
 
-        def self.create_http(pact:, host: "127.0.0.1", port: 0)
+        def self.create_for_http!(pact:, host: "127.0.0.1", port: 0)
           new(pact: pact, transport: TRANSPORT_HTTP, host: host, port: port)
         end
 
@@ -67,6 +67,10 @@ module Sbmt
 
         def matched?
           PactFfi::MockServer.matched(@handle)
+        end
+
+        def mismatches
+          PactFfi::MockServer.mismatches(@handle)
         end
 
         def cleanup

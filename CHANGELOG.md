@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.5.0] - 2024-06-05
+
+### Fixed
+- GRPC consumer DSL (rspec) refined
+- plugin matchers refined
+
 ## [0.4.1] - 2024-06-06
 
 ### Fixed
