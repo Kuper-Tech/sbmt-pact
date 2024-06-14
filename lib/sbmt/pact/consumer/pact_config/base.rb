@@ -7,11 +7,15 @@ module Sbmt
         class Base
           attr_reader :consumer_name, :provider_name, :pact_dir, :log_level
 
-          def initialize(consumer_name:, provider_name:, pact_dir: nil, log_level: :info)
+          def initialize(consumer_name:, provider_name:, opts: {})
             @consumer_name = consumer_name
             @provider_name = provider_name
-            @pact_dir = pact_dir || Rails.root.join("pacts").to_s
-            @log_level = log_level
+            @pact_dir = opts[:pact_dir] || Rails.root.join("pacts").to_s
+            @log_level = opts[:log_level] || :info
+          end
+
+          def new_interaction(description = nil)
+            raise NotImplementedError, "#new_interaction should be implemented"
           end
         end
       end
