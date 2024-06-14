@@ -22,6 +22,14 @@ module Sbmt
         "FFI error: reason: #{@reason}, status: #{@status}, message: #{@msg}"
       end
     end
+
+    def self.configure
+      yield configuration if block_given?
+    end
+
+    def self.configuration
+      @configuration ||= Sbmt::Pact::Configuration.new
+    end
   end
 end
 

@@ -23,7 +23,7 @@ module Sbmt
 
           @server = Gruf::Server.new(Gruf.server_options)
           @thread = Thread.new do
-            Rails.logger.debug "starting grpc server"
+            @logger.debug "[gruf] starting grpc server"
             @server.start!
           end
           @server.server.wait_till_running(10)

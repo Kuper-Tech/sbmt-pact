@@ -6,12 +6,8 @@ module Sbmt
   module Pact
     module Consumer
       module PactConfig
-        def self.new_grpc(consumer_name:, provider_name:, mock_host: "127.0.0.1", mock_port: 3009, log_level: :info)
-          Grpc.new(
-            consumer_name: consumer_name, provider_name: provider_name,
-            mock_host: mock_host, mock_port: mock_port,
-            log_level: log_level
-          )
+        def self.new_grpc(consumer_name:, provider_name:, opts: {})
+          Grpc.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
         end
       end
     end

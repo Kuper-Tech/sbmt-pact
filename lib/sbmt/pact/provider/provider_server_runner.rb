@@ -9,18 +9,22 @@ module Sbmt
         attr_reader :logger
 
         def initialize(port: 9001, host: "127.0.0.1", path: "/setup-provider", logger: nil)
+          @host = host
+          @port = port
           @path = path
           @provider_setup_states = {}
           @provider_teardown_states = {}
           @logger = logger || Logger.new($stdout)
 
-          @server = ProviderStateServer.new(port: port, host: host, path: path, logger: @logger)
+          @servlet = ProviderStateServlet.new(logger: @logger)
           @thread = nil
         end
 
         def start
           raise "server already running, stop server before starting new one" if @thread
 
+          @server = WEBrick::HTTPServer.new({BindAddress: @host, Port: @port}, WEBrick::Config::HTTP)
+          @server.mount(@path, @servlet)
           @thread = Thread.new do
             Rails.logger.debug "starting provider setup server"
             @server.start
@@ -30,7 +34,7 @@ module Sbmt
         def stop
           @logger.info("stopping provider setup server")
 
-          @server.stop
+          @server&.shutdown
           @thread&.join
 
           @logger.info("provider setup server stopped")
@@ -47,12 +51,20 @@ module Sbmt
           stop
         end
 
-        def add_setup_state(state_name, &block)
-          @server.add_setup_state(state_name, &block)
+        def add_setup_state(state_name, use_before_setup_hook = true, &block)
+          @servlet.add_setup_state(state_name, use_before_setup_hook, &block)
         end
 
-        def add_teardown_state(state_name, &block)
-          @server.add_teardown_state(state_name, &block)
+        def add_teardown_state(state_name, use_after_teardown_hook = true, &block)
+          @servlet.add_teardown_state(state_name, use_after_teardown_hook, &block)
+        end
+
+        def set_before_setup_hook(&block)
+          @servlet.before_setup(&block)
+        end
+
+        def set_after_teardown_hook(&block)
+          @servlet.after_teardown(&block)
         end
       end
     end

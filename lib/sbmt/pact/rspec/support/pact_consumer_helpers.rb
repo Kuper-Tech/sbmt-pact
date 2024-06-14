@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Dsl
+module SbmtPactConsumerDsl
   module ClassMethods
     def has_grpc_pact_between(consumer, provider, opts: {})
       raise "has_pact_between is designed to be used with RSpec 3+" unless defined?(::RSpec)
@@ -25,6 +25,6 @@ module Dsl
 end
 
 RSpec.configure do |config|
-  config.include Dsl, pact_entity: :consumer
-  config.extend Dsl::ClassMethods, pact_entity: :consumer
+  config.include SbmtPactConsumerDsl, pact_entity: :consumer
+  config.extend SbmtPactConsumerDsl::ClassMethods, pact_entity: :consumer
 end
