@@ -5,6 +5,8 @@ module Sbmt
     module Provider
       # inspired by Gruf::Cli::Executor
       class GrufServer
+        SERVER_STOP_TIMEOUT_SEC = 15
+
         def initialize(options = {})
           @options = options
 
@@ -13,7 +15,7 @@ module Sbmt
           @server_pid = nil
 
           @services = @options[:services].is_a?(Array) ? @options[:services] : []
-          @logger = @options[:logger] || Gruf.logger || ::Logger.new($stdout)
+          @logger = @options[:logger] || ::Logger.new($stdout)
         end
 
         def start
@@ -22,6 +24,7 @@ module Sbmt
           @logger.info("[gruf] starting standalone server with options: #{@options}")
 
           @server = Gruf::Server.new(Gruf.server_options)
+          @services.each { |s| @server.add_service(s) } if @services.any?
           @thread = Thread.new do
             @logger.debug "[gruf] starting grpc server"
             @server.start!
@@ -34,8 +37,9 @@ module Sbmt
         def stop
           @logger.info("[gruf] stopping standalone server")
 
-          @server.server.stop
-          @thread&.join
+          @server&.server&.stop
+          @thread&.join(SERVER_STOP_TIMEOUT_SEC)
+          @thread&.kill
 
           @logger.info("[gruf] standalone server stopped")
         end

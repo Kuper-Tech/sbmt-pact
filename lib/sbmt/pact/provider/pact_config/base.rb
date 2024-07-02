@@ -6,7 +6,7 @@ module Sbmt
       module PactConfig
         class Base
           attr_reader :provider_name, :provider_version, :log_level, :provider_setup_server, :provider_setup_url, :provider_setup_port,
-            :consumer_branch, :consumer_version, :broker_url, :broker_username, :broker_password
+            :consumer_branch, :consumer_version, :consumer_name, :broker_url, :broker_username, :broker_password, :verify_only
 
           def initialize(provider_name:, opts: {})
             @provider_name = provider_name
@@ -14,10 +14,12 @@ module Sbmt
             @provider_setup_port = opts[:provider_setup_port] || 9001
             @provider_version = opts[:provider_version] || ENV.fetch("PACT_PROVIDER_VERSION", "1.0.0")
             @consumer_branch = opts[:consumer_branch] || ENV.fetch("PACT_CONSUMER_BRANCH", nil)
-            @consumer_version = opts[:consumer_version] || ENV.fetch("PACT_CONSUMER_VERSION", "1.0.0")
+            @consumer_version = opts[:consumer_version] || ENV.fetch("PACT_CONSUMER_VERSION", nil)
+            @consumer_name = opts[:consumer_name] || ENV.fetch("PACT_CONSUMER_FULL_NAME", nil)
             @broker_url = opts[:broker_url] || ENV.fetch("PACT_BROKER_URL", nil)
             @broker_username = opts[:broker_username] || ENV.fetch("PACT_BROKER_USERNAME", "")
             @broker_password = opts[:broker_password] || ENV.fetch("PACT_BROKER_PASSWORD", "")
+            @verify_only = opts[:verify_only] || []
 
             @provider_setup_url = opts[:provider_setup_url] || "http://localhost:#{@provider_setup_port}/setup-provider"
             @provider_setup_server = ProviderServerRunner.new(port: @provider_setup_port)

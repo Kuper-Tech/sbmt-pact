@@ -11,6 +11,8 @@ module Sbmt
         def initialize(logger: Logger.new($stdout))
           super(build_proc)
 
+          @logger = logger
+
           @provider_setup_states = {}
           @provider_teardown_states = {}
 

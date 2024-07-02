@@ -28,7 +28,8 @@ RSpec.describe Sbmt::Pact::Matchers do
   end
 
   it "properly builds matcher for any string" do
-    expect(test_class.match_any_string).to eq("matching(regex, '(?-mix:.+)', 'any')")
+    expect(test_class.match_any_string).to eq("matching(regex, '(?-mix:.*)', 'any')")
+    expect(test_class.match_any_string("")).to eq("matching(regex, '(?-mix:.*)', '')")
   end
 
   it "properly builds matcher for boolean values" do
