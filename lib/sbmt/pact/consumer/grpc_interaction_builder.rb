@@ -11,7 +11,7 @@ module Sbmt
         CONTENT_TYPE = "application/protobuf"
         GRPC_CONTENT_TYPE = "application/grpc"
         PROTOBUF_PLUGIN_NAME = "protobuf"
-        PROTOBUF_PLUGIN_VERSION = "0.3.5"
+        PROTOBUF_PLUGIN_VERSION = "0.4.0"
 
         class PluginInitError < Sbmt::Pact::FfiError; end
 
@@ -93,18 +93,15 @@ module Sbmt
         end
 
         def interaction_json
-          base = {
+          result = {
             "pact:proto": @proto_path,
             "pact:proto-service": "#{@service_name}/#{@method_name}",
             "pact:content-type": CONTENT_TYPE,
             request: @request
           }
 
-          result = if @response_meta.is_a?(Hash)
-            base.merge(responseMetadata: @response_meta)
-          else
-            base.merge(response: @response)
-          end
+          result[:response] = @response if @response.is_a?(Hash)
+          result[:responseMetadata] = @response_meta if @response_meta.is_a?(Hash)
 
           JSON.dump(result)
         end

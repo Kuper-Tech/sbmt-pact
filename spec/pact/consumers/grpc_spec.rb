@@ -2,6 +2,6 @@
 
 require "sbmt/pact/rspec"
 
-RSpec.describe "Sbmt::Pact::Consumers::Grpc", type: :pact do
+RSpec.describe "Sbmt::Pact::Consumers::Grpc", :pact do
   grpc_pact_provider "sbmt-pact-test-app"
 end

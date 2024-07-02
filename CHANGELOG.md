@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.7.0] - 2024-06-21
+
+### Added
+- Ability to limit consumers to verify with provider
+
+### Fixed
+- Changed pact-specs rspec meta (`type: :pact` => `pact: true`) for compatibility with legacy pact-ruby / older rspec
+- Bump used pact-protobuf-plugin version to 0.4.0
+- `match_any_string` now matches empty strings
+- limit pact:verify specs only to consumer pact-tests dir
+
 ## [0.6.0] - 2024-06-05
 
 ### Fixed

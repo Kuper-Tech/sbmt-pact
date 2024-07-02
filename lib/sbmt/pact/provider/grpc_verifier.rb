@@ -7,6 +7,8 @@ module Sbmt
   module Pact
     module Provider
       class GrpcVerifier
+        attr_reader :logger
+
         class VerificationError < Sbmt::Pact::FfiError; end
 
         class VerifierError < Sbmt::Pact::Error; end
@@ -29,24 +31,30 @@ module Sbmt
 
           @provider_state = nil
           @grpc_server = GrufServer.new(hostname: "127.0.0.1:#{@pact_config.grpc_port}", services: @pact_config.grpc_services)
+          @logger = Logger.new($stdout)
         end
 
         def verify!
           raise VerifierError.new("interaction is designed to be used one-time only") if defined?(@used)
 
+          exception = nil
           pact_handle = init_pact
 
           start_servers!
 
+          logger.info("[grpc_verifier] starting provider verification")
+
           result = PactFfi::Verifier.execute(pact_handle)
           if VERIFICATION_ERRORS[result].present?
             error = VERIFICATION_ERRORS[result]
-            raise VerificationError.new("There was an error while trying to verify provider \"#{@pact_config.provider_name}\"", error[:reason], error[:status])
+            exception = VerificationError.new("There was an error while trying to verify provider \"#{@pact_config.provider_name}\"", error[:reason], error[:status])
           end
         ensure
           @used = true
-          stop_servers
           PactFfi::Verifier.shutdown(pact_handle)
+          stop_servers
+
+          raise exception if exception
         end
 
         private
@@ -66,28 +74,63 @@ module Sbmt
 
           Sbmt::Pact::Native::Logger.log_to_stdout(@pact_config.log_level)
 
+          logger.info("[grpc_verifier] verification initialized for provider #{@pact_config.provider_name}, version #{@pact_config.provider_version}")
+
           handle
         end
 
         def start_servers!
+          logger.info("[grpc_verifier] starting services")
+
           @grpc_server.start
           @pact_config.provider_setup_server.start
         end
 
         def stop_servers
+          logger.info("[grpc_verifier] stopping services")
+
           @grpc_server.stop
           @pact_config.provider_setup_server.stop
         end
 
         def configure_verification_source(handle)
-          return PactFfi::Verifier.add_directory_source(handle, Rails.root.join("pacts").to_s) if @pact_config.broker_url.blank?
-          return PactFfi::Verifier.broker_source(handle, @pact_config.broker_url, @pact_config.broker_username, @pact_config.broker_password, nil) if @pact_config.consumer_branch.blank?
+          if @pact_config.broker_url.blank?
+            path = Rails.root.join("pacts").to_s
+            logger.info("[grpc_verifier] pact broker url is not set, using #{path} as a verification source")
+            return PactFfi::Verifier.add_directory_source(handle, path)
+          end
 
-          json = JSON.dump(branch: @pact_config.consumer_branch).to_s
-          filters = [FFI::MemoryPointer.from_string(json)]
+          selectors = build_consumer_selectors(@pact_config.verify_only, @pact_config.consumer_name, @pact_config.consumer_branch)
+          if selectors.blank?
+            logger.info("[grpc_verifier] no consumer selectors, using pact broker url #{@pact_config.broker_url} as a verification source")
+            return PactFfi::Verifier.broker_source(handle, @pact_config.broker_url, @pact_config.broker_username, @pact_config.broker_password, nil)
+          end
+
+          logger.info("[grpc_verifier] using pact broker url #{@pact_config.broker_url} with consumer selectors: #{JSON.dump(selectors)} as a verification source")
+
+          filters = selectors.map do |selector|
+            FFI::MemoryPointer.from_string(JSON.dump(selector).to_s)
+          end
           filters_ptr = FFI::MemoryPointer.new(:pointer, filters.size + 1)
           filters_ptr.write_array_of_pointer(filters)
           PactFfi::Verifier.broker_source_with_selectors(handle, @pact_config.broker_url, @pact_config.broker_username, @pact_config.broker_password, nil, 0, nil, nil, 0, nil, filters_ptr, filters.size, nil, 0)
+        end
+
+        def build_consumer_selectors(verify_only, consumer_name, consumer_branch)
+          # if verify_only and consumer_name are defined - select only needed consumer
+          if verify_only.present?
+            # select proper consumer branch if defined
+            if consumer_name.present? && verify_only.include?(consumer_name)
+              return [{"branch" => consumer_branch.presence || "master", "consumer" => consumer_name}]
+            end
+            # or main branches otherwise
+            return verify_only.map { |name| {"consumer" => name, "branch" => "master"} }
+          end
+
+          # select provided consumer_name
+          return [{"branch" => consumer_branch.presence || "master", "consumer" => consumer_name}] if consumer_name.present?
+
+          [{"branch" => "master"}]
         end
       end
     end

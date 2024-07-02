@@ -4,7 +4,7 @@ module Sbmt
   module Pact
     module Matchers
       UUID_REGEX = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
-      ANY_STRING_REGEX = /.+/
+      ANY_STRING_REGEX = /.*/
 
       # high-level pact plugin matchers below
 

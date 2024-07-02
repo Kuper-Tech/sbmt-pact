@@ -3,7 +3,7 @@
 require "sbmt/pact/rspec"
 require "internal/config/configs/pet_store_grpc_config"
 
-RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", type: :pact do
+RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", :pact do
   include Anyway::Testing::Helpers
 
   has_grpc_pact_between "sbmt-pact-test-app", "sbmt-pact-test-app"
