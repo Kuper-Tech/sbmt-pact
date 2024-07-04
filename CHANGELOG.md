@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.8.0] - 2024-07-04
+
+### Added
+- Use `deployed: true` for default consumer selectors instead master branch
+
 ## [0.7.0] - 2024-06-21
 
 ### Added

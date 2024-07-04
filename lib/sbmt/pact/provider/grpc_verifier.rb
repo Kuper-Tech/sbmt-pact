@@ -14,6 +14,7 @@ module Sbmt
         class VerifierError < Sbmt::Pact::Error; end
 
         PROVIDER_TRANSPORT_TYPE = "grpc"
+        DEFAULT_CONSUMER_SELECTORS = {"deployed" => true, "environment" => "production"}.freeze
 
         # https://docs.rs/pact_ffi/0.4.17/pact_ffi/verifier/fn.pactffi_verify.html#errors
         VERIFICATION_ERRORS = {
@@ -121,16 +122,18 @@ module Sbmt
           if verify_only.present?
             # select proper consumer branch if defined
             if consumer_name.present? && verify_only.include?(consumer_name)
-              return [{"branch" => consumer_branch.presence || "master", "consumer" => consumer_name}]
+              return [{"branch" => consumer_branch, "consumer" => consumer_name}] if consumer_branch.present?
+              return [DEFAULT_CONSUMER_SELECTORS.merge("consumer" => consumer_name)]
             end
-            # or main branches otherwise
-            return verify_only.map { |name| {"consumer" => name, "branch" => "master"} }
+            # or default selectors
+            return verify_only.map { |name| DEFAULT_CONSUMER_SELECTORS.merge("consumer" => name) }
           end
 
           # select provided consumer_name
-          return [{"branch" => consumer_branch.presence || "master", "consumer" => consumer_name}] if consumer_name.present?
+          return [{"branch" => consumer_branch, "consumer" => consumer_name}] if consumer_name.present? && consumer_branch.present?
+          return [DEFAULT_CONSUMER_SELECTORS.merge("consumer" => consumer_name)] if consumer_name.present?
 
-          [{"branch" => "master"}]
+          [DEFAULT_CONSUMER_SELECTORS]
         end
       end
     end
