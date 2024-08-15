@@ -2,6 +2,11 @@
 
 module SbmtPactConsumerDsl
   module ClassMethods
+    def has_http_pact_between(consumer, provider, opts: {})
+      include Sbmt::Pact::Matchers::Basic
+      _has_pact_between(:http, consumer, provider, opts: opts)
+    end
+
     def has_grpc_pact_between(consumer, provider, opts: {})
       include Sbmt::Pact::Matchers::Plugin
       _has_pact_between(:grpc, consumer, provider, opts: opts)

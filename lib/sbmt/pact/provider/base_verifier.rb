@@ -58,7 +58,7 @@ module Sbmt
 
         def init_pact
           handle = PactFfi::Verifier.new_for_application("sbmt-pact", PactFfi.version)
-          PactFfi::Verifier.set_provider_info(handle, @pact_config.provider_name, "", "", 0, "")
+          set_provider_info(handle)
           PactFfi::Verifier.set_provider_state(handle, @pact_config.provider_setup_url, 1, 1)
           PactFfi::Verifier.set_verification_options(handle, 0, 10000)
           PactFfi::Verifier.set_publish_options(handle, @pact_config.provider_version, "", nil, 0, "")
@@ -75,6 +75,10 @@ module Sbmt
           logger.info("[verifier] verification initialized for provider #{@pact_config.provider_name}, version #{@pact_config.provider_version}")
 
           handle
+        end
+
+        def set_provider_info(pact_handle)
+          PactFfi::Verifier.set_provider_info(pact_handle, @pact_config.provider_name, "", "", 0, "")
         end
 
         def add_provider_transport(pact_handle)

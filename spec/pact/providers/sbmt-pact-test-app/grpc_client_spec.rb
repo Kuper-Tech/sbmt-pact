@@ -11,9 +11,7 @@ RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", :pact do
   let(:pet_id) { 123 }
 
   let(:api) { PetStore::Grpc::PetStore::V1::PetsApi.new }
-  let(:make_request) do
-    api.pet_by_id(PetStore::Grpc::PetStore::V1::PetByIdRequest.new(id: pet_id))
-  end
+  let(:make_request) { api.pet_by_id(id: pet_id) }
 
   let(:interaction) do
     new_interaction

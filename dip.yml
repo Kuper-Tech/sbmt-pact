@@ -68,6 +68,13 @@ interaction:
     service: ruby
     command: bundle exec rubocop
 
+  pact:
+    description: Run pact tests
+    service: backend
+    environment:
+      RAILS_ENV: test
+    command: bundle exec rspec -t pact
+
   setup:
     description: Install deps
     service: ruby
