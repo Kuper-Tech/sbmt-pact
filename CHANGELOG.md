@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.9.0] - 2024-08-03
+
+### Added
+- pact-broker-proxy to filter proper transport types in specs
+- ability to run pact-tests on CI + dip
+
+### Fixed
+- refactor matchers
+
 ## [0.8.0] - 2024-07-04
 
 ### Added

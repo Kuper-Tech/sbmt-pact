@@ -15,7 +15,7 @@ module Sbmt
           end
 
           def new_interaction(description = nil)
-            raise NotImplementedError, "#new_interaction should be implemented"
+            raise Sbmt::Pact::ImplementationRequired, "#new_interaction should be implemented"
           end
         end
       end

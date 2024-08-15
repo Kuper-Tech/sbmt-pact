@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "rspec"
-require_relative "rspec/support/pact_matching_helpers"
 require_relative "rspec/support/pact_consumer_helpers"
 require_relative "rspec/support/pact_provider_helpers"
 

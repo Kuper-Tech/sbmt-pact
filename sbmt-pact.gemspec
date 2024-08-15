@@ -31,14 +31,15 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "zeitwerk", "~> 2.3"
-  spec.add_dependency "pact-ffi", "~> 0.0.3.2"
+  spec.add_dependency "pact-ffi", "~> 0.0.3.3"
   spec.add_dependency "webrick"
+  spec.add_dependency "rack-proxy"
 
   spec.add_development_dependency "appraisal", ">= 2.4"
   spec.add_development_dependency "bundler", ">= 2.3"
   spec.add_development_dependency "combustion", ">= 1.3"
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "sbmt-app", ">= 1.43.1"
-  spec.add_development_dependency "sbmt-dev", ">= 0.6.0"
+  spec.add_development_dependency "sbmt-dev", ">= 0.17.2"
   spec.add_development_dependency "dry-monads", "~> 1.3"
 end

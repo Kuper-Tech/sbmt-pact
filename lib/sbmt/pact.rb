@@ -9,6 +9,8 @@ module Sbmt
   module Pact
     class Error < StandardError; end
 
+    class ImplementationRequired < Error; end
+
     class FfiError < Error
       def initialize(msg, reason, status)
         super(msg)

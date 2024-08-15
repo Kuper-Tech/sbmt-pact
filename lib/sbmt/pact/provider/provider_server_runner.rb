@@ -8,23 +8,29 @@ module Sbmt
       class ProviderServerRunner
         attr_reader :logger
 
-        def initialize(port: 9001, host: "127.0.0.1", path: "/setup-provider", logger: nil)
+        SETUP_PROVIDER_STATE_PATH = "/setup-provider"
+
+        def initialize(port: 9001, host: "127.0.0.1", logger: nil)
           @host = host
           @port = port
-          @path = path
           @provider_setup_states = {}
           @provider_teardown_states = {}
           @logger = logger || Logger.new($stdout)
 
-          @servlet = ProviderStateServlet.new(logger: @logger)
+          @state_servlet = ProviderStateServlet.new(logger: @logger)
           @thread = nil
+        end
+
+        def state_setup_url
+          "http://#{@host}:#{@port}#{SETUP_PROVIDER_STATE_PATH}"
         end
 
         def start
           raise "server already running, stop server before starting new one" if @thread
 
           @server = WEBrick::HTTPServer.new({BindAddress: @host, Port: @port}, WEBrick::Config::HTTP)
-          @server.mount(@path, @servlet)
+          @server.mount(SETUP_PROVIDER_STATE_PATH, @state_servlet)
+
           @thread = Thread.new do
             Rails.logger.debug "starting provider setup server"
             @server.start
@@ -52,19 +58,19 @@ module Sbmt
         end
 
         def add_setup_state(state_name, use_before_setup_hook = true, &block)
-          @servlet.add_setup_state(state_name, use_before_setup_hook, &block)
+          @state_servlet.add_setup_state(state_name, use_before_setup_hook, &block)
         end
 
         def add_teardown_state(state_name, use_after_teardown_hook = true, &block)
-          @servlet.add_teardown_state(state_name, use_after_teardown_hook, &block)
+          @state_servlet.add_teardown_state(state_name, use_after_teardown_hook, &block)
         end
 
         def set_before_setup_hook(&block)
-          @servlet.before_setup(&block)
+          @state_servlet.before_setup(&block)
         end
 
         def set_after_teardown_hook(&block)
-          @servlet.after_teardown(&block)
+          @state_servlet.after_teardown(&block)
         end
       end
     end

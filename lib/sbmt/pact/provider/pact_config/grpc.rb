@@ -16,6 +16,10 @@ module Sbmt
             @grpc_services = opts[:grpc_services] || []
           end
 
+          def filter_type
+            PACT_BROKER_FILTER_TYPE_GRPC
+          end
+
           def new_verifier
             GrpcVerifier.new(self)
           end
