@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-describe Sbmt::Pact::Provider::GrpcVerifier do
-  subject { described_class.new(Sbmt::Pact::Provider::PactConfig::Grpc.new(provider_name: "provider")) }
+describe Sbmt::Pact::Provider::BaseVerifier do
+  subject { described_class.new(Sbmt::Pact::Provider::PactConfig::Base.new(provider_name: "provider")) }
 
   let(:build_selectors) { subject.send(:build_consumer_selectors, verify_only, consumer_name, consumer_branch) }
 

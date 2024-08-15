@@ -19,5 +19,22 @@ services:
       - ${SBMT_RUBYGEMS_PATH:-..}:/app/vendor/gems:cached
       - bundler_data:/usr/local/bundle
 
+  pact-broker:
+    image: dreg.sbmt.io/dhub/pactfoundation/pact-broker
+    ports:
+      - 9292
+    environment:
+      PACT_BROKER_DATABASE_ADAPTER: sqlite
+      PACT_BROKER_DATABASE_NAME: pact_broker.sqlite
+      PACT_BROKER_LOG_LEVEL: DEBUG
+
+  pact-cli:
+    image: dreg.sbmt.io/dhub/pactfoundation/pact-cli
+    working_dir: /app
+    depends_on:
+      - pact-broker
+    volumes:
+      - ./spec/internal/pacts:/app:cached
+
 volumes:
   bundler_data:

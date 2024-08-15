@@ -6,8 +6,13 @@ module Sbmt
   module Pact
     module Consumer
       module PactConfig
-        def self.new_grpc(consumer_name:, provider_name:, opts: {})
-          Grpc.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
+        def self.new(transport_type, consumer_name:, provider_name:, opts: {})
+          case transport_type
+          when :grpc
+            Grpc.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
+          else
+            raise ArgumentError, "unknown transport_type: #{transport_type}"
+          end
         end
       end
     end

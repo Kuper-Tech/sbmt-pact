@@ -8,6 +8,7 @@ module Sbmt
   module Pact
     module Consumer
       class GrpcInteractionBuilder
+        DESCRIPTION_PREFIX = "grpc: "
         CONTENT_TYPE = "application/protobuf"
         GRPC_CONTENT_TYPE = "application/grpc"
         PROTOBUF_PLUGIN_NAME = "protobuf"
@@ -120,7 +121,7 @@ module Sbmt
           pact_handle = init_pact
           init_plugin!(pact_handle)
 
-          message_pact = PactFfi::SyncMessageConsumer.new_interaction(pact_handle, @description)
+          message_pact = PactFfi::SyncMessageConsumer.new_interaction(pact_handle, description)
           @provider_state_meta&.each_pair do |provider_state, meta|
             if meta.present?
               meta.each_pair { |k, v| PactFfi.given_with_param(message_pact, provider_state, k.to_s, v.to_s) }
@@ -132,7 +133,7 @@ module Sbmt
           result = PactFfi::PluginConsumer.interaction_contents(message_pact, 0, GRPC_CONTENT_TYPE, interaction_json)
           if CREATE_INTERACTION_ERRORS[result].present?
             error = CREATE_INTERACTION_ERRORS[result]
-            raise CreateInteractionError.new("There was an error while trying to add interaction \"#{@description}\"", error[:reason], error[:status])
+            raise CreateInteractionError.new("There was an error while trying to add interaction \"#{description}\"", error[:reason], error[:status])
           end
 
           mock_server = MockServer.create_for_grpc!(pact: pact_handle, host: @pact_config.mock_host, port: @pact_config.mock_port)
@@ -177,6 +178,10 @@ module Sbmt
 
           error = INIT_PLUGIN_ERRORS[result]
           raise PluginInitError.new("There was an error while trying to initialize plugin #{PROTOBUF_PLUGIN_NAME}/#{PROTOBUF_PLUGIN_VERSION}", error[:reason], error[:status])
+        end
+
+        def description
+          "#{DESCRIPTION_PREFIX}#{@description}"
         end
       end
     end

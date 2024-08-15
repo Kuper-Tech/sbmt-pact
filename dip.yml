@@ -42,6 +42,27 @@ interaction:
       rails-7.0:
         command: bundle exec appraisal rails-7.0 rspec
 
+  pact:
+    description: Run pact tests
+    service: ruby
+    environment:
+      RAILS_ENV: test
+      PACT_DO_NOT_TRACK: true
+    subcommands:
+      consumer:
+        command: bundle exec rspec -t pact spec/pact/providers/**/*_spec.rb
+      provider:
+        command: bundle exec rspec -t pact spec/pact/consumers/*_spec.rb
+      provider-with-local-broker:
+        command: /bin/sh -c 'PACT_CONSUMER_BRANCH=master PACT_CONSUMER_FULL_NAME=sbmt-pact-test-app PACT_BROKER_URL=http://pact-broker:9292 bundle exec rspec -t pact spec/pact/consumers/*_spec.rb'
+
+  pact-cli:
+    description: Run pact-broker commands
+    service: pact-cli
+    subcommands:
+      publish:
+        command: pact-broker publish --consumer-app-version 1.0.0 --branch master --broker-base-url http://pact-broker:9292 sbmt-pact-test-app-sbmt-pact-test-app.json
+
   rubocop:
     description: Run Ruby linter
     service: ruby

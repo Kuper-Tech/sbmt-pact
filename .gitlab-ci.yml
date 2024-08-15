@@ -6,6 +6,8 @@ include:
 lint:
   stage: test
   image: dreg.sbmt.io/dhub/library/ruby:3.3
+  tags:
+  - paas-stage
   script:
     - bundle install
     - bundle exec rubocop
@@ -13,6 +15,14 @@ lint:
 tests:
   stage: test
   image: dreg.sbmt.io/dhub/library/ruby:$RUBY_VERSION
+  tags:
+    - paas-medium
+  services:
+    - name: dreg.sbmt.io/dhub/library/postgres:13
+      alias: postgres
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
+    DATABASE_URL: postgres://postgres:secret@postgres:5432
   parallel:
     matrix:
       - RUBY_VERSION: ['2.7', '3.0', '3.1', '3.2', '3.3']
@@ -21,6 +31,8 @@ tests:
     - bin/setup
   script:
     - bundle exec appraisal rspec --format RspecJunitFormatter --out test-results/rspec_$RUBY_VERSION.xml --format documentation
+    - bundle exec appraisal rspec -t pact spec/pact/providers/**/*_spec.rb
+    - bundle exec appraisal rspec -t pact spec/pact/consumers/*_spec.rb
   artifacts:
     reports:
       junit: test-results/rspec*.xml
