@@ -13,3 +13,4 @@ lefthook-local.yml
 /Gemfile.lock
 /gemfiles/*gemfile*
 /spec/internal/log/*.log
+/spec/internal/pacts

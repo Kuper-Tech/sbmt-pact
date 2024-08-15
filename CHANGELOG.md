@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.10.0] - 2024-08-15
+
+### Added
+- HTTP Rspec DSL
+
 ## [0.9.0] - 2024-08-03
 
 ### Added

@@ -8,6 +8,8 @@ module Sbmt
       module PactConfig
         def self.new(transport_type, consumer_name:, provider_name:, opts: {})
           case transport_type
+          when :http
+            Http.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
           when :grpc
             Grpc.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
           else

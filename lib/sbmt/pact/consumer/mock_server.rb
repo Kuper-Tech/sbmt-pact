@@ -6,7 +6,7 @@ module Sbmt
   module Pact
     module Consumer
       class MockServer
-        attr_reader :host, :port, :transport
+        attr_reader :host, :port, :transport, :handle
 
         TRANSPORT_HTTP = "http"
         TRANSPORT_GRPC = "grpc"
