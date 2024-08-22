@@ -8,6 +8,7 @@ module Sbmt
   module Pact
     module Provider
       class BaseVerifier
+        PROVIDER_TRANSPORT_TYPE = nil
         attr_reader :logger
 
         class VerificationError < Sbmt::Pact::FfiError; end
@@ -34,6 +35,11 @@ module Sbmt
 
         def verify!
           raise VerifierError.new("interaction is designed to be used one-time only") if defined?(@used)
+
+          if consumer_selectors.blank?
+            logger.info("[verifier] does not need to verify consumer #{@pact_config.consumer_name}")
+            return
+          end
 
           exception = nil
           pact_handle = init_pact
@@ -73,7 +79,7 @@ module Sbmt
 
           Sbmt::Pact::Native::Logger.log_to_stdout(@pact_config.log_level)
 
-          logger.info("[verifier] verification initialized for provider #{@pact_config.provider_name}, version #{@pact_config.provider_version}")
+          logger.info("[verifier] verification initialized for provider #{@pact_config.provider_name}, version #{@pact_config.provider_version}, transport #{self.class::PROVIDER_TRANSPORT_TYPE}")
 
           handle
         end
@@ -94,10 +100,13 @@ module Sbmt
         def start_servers!
           logger.info("[verifier] starting services")
 
+          @servers_started = true
           @pact_config.start_servers
         end
 
         def stop_servers
+          return unless @servers_started
+
           logger.info("[verifier] stopping services")
 
           @pact_config.stop_servers
@@ -110,15 +119,9 @@ module Sbmt
             return PactFfi::Verifier.add_directory_source(handle, path)
           end
 
-          selectors = build_consumer_selectors(@pact_config.verify_only, @pact_config.consumer_name, @pact_config.consumer_branch)
-          if selectors.blank?
-            logger.info("[verifier] no consumer selectors, using pact broker url #{@pact_config.broker_url} as a verification source")
-            return PactFfi::Verifier.broker_source(handle, @pact_config.pact_broker_proxy_url, @pact_config.broker_username, @pact_config.broker_password, nil)
-          end
+          logger.info("[verifier] using pact broker url #{@pact_config.broker_url} with consumer selectors: #{JSON.dump(consumer_selectors)} as a verification source")
 
-          logger.info("[verifier] using pact broker url #{@pact_config.broker_url} with consumer selectors: #{JSON.dump(selectors)} as a verification source")
-
-          filters = selectors.map do |selector|
+          filters = consumer_selectors.map do |selector|
             FFI::MemoryPointer.from_string(JSON.dump(selector).to_s)
           end
           filters_ptr = FFI::MemoryPointer.new(:pointer, filters.size + 1)
@@ -126,11 +129,16 @@ module Sbmt
           PactFfi::Verifier.broker_source_with_selectors(handle, @pact_config.pact_broker_proxy_url, @pact_config.broker_username, @pact_config.broker_password, nil, 0, nil, nil, 0, nil, filters_ptr, filters.size, nil, 0)
         end
 
+        def consumer_selectors
+          @consumer_selectors ||= build_consumer_selectors(@pact_config.verify_only, @pact_config.consumer_name, @pact_config.consumer_branch)
+        end
+
         def build_consumer_selectors(verify_only, consumer_name, consumer_branch)
           # if verify_only and consumer_name are defined - select only needed consumer
           if verify_only.present?
             # select proper consumer branch if defined
-            if consumer_name.present? && verify_only.include?(consumer_name)
+            if consumer_name.present?
+              return [] unless verify_only.include?(consumer_name)
               return [{"branch" => consumer_branch, "consumer" => consumer_name}] if consumer_branch.present?
               return [DEFAULT_CONSUMER_SELECTORS.merge("consumer" => consumer_name)]
             end

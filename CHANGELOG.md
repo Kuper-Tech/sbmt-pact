@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.11.1] - 2024-08-22
+
+### Fixed
+- the `verify_only` config option is now set based on the `PACT_CONSUMER_FULL_NAME` environment variable. 
+- if the current `consumer_name` does not match the `verify_only` option, then the consumer verification is skipped
+
 ## [0.11.0] - 2024-08-07
 
 ### Added
