@@ -22,11 +22,11 @@ module Sbmt
             @provider_version = opts[:provider_version] || ENV.fetch("PACT_PROVIDER_VERSION", "1.0.0")
             @consumer_branch = opts[:consumer_branch] || ENV.fetch("PACT_CONSUMER_BRANCH", nil)
             @consumer_version = opts[:consumer_version] || ENV.fetch("PACT_CONSUMER_VERSION", nil)
-            @consumer_name = opts[:consumer_name] || ENV.fetch("PACT_CONSUMER_FULL_NAME", nil)
+            @consumer_name = opts[:consumer_name]
             @broker_url = opts[:broker_url] || ENV.fetch("PACT_BROKER_URL", nil)
             @broker_username = opts[:broker_username] || ENV.fetch("PACT_BROKER_USERNAME", "")
             @broker_password = opts[:broker_password] || ENV.fetch("PACT_BROKER_PASSWORD", "")
-            @verify_only = opts[:verify_only] || []
+            @verify_only = opts[:verify_only] || [ENV.fetch("PACT_CONSUMER_FULL_NAME", nil)].compact
 
             @provider_setup_server = ProviderServerRunner.new(port: @provider_setup_port)
             if @broker_url.present?

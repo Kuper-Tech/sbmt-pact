@@ -22,11 +22,7 @@ describe Sbmt::Pact::Provider::BaseVerifier do
       let(:consumer_branch) { "feature-branch" }
 
       it "builds proper selectors" do
-        expect(build_selectors)
-          .to eq([
-            {"consumer" => "consumer-1", "deployed" => true, "environment" => "production"},
-            {"consumer" => "consumer-2", "deployed" => true, "environment" => "production"}
-          ])
+        expect(build_selectors).to be_empty
       end
     end
 
