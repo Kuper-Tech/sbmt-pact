@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "zeitwerk", "~> 2.3"
-  spec.add_dependency "pact-ffi", "~> 0.0.3.3"
+  spec.add_dependency "pact-ffi", "~> 0.4.22"
   spec.add_dependency "webrick"
   spec.add_dependency "rack-proxy"
 
@@ -41,5 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "sbmt-app", ">= 1.43.1"
   spec.add_development_dependency "sbmt-dev", ">= 0.17.2"
+  spec.add_development_dependency "sbmt-kafka_consumer", ">= 1.0"
+  spec.add_development_dependency "sbmt-kafka_producer", ">= 1.0"
   spec.add_development_dependency "dry-monads", "~> 1.3"
 end

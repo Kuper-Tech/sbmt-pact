@@ -12,6 +12,8 @@ module Sbmt
             Http.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
           when :grpc
             Grpc.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
+          when :message
+            Message.new(consumer_name: consumer_name, provider_name: provider_name, opts: opts)
           else
             raise ArgumentError, "unknown transport_type: #{transport_type}"
           end

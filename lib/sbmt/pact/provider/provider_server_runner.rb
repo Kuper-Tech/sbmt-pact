@@ -9,6 +9,7 @@ module Sbmt
         attr_reader :logger
 
         SETUP_PROVIDER_STATE_PATH = "/setup-provider"
+        VERIFY_MESSAGE_PATH = "/verify-message"
 
         def initialize(port: 9001, host: "127.0.0.1", logger: nil)
           @host = host
@@ -18,6 +19,7 @@ module Sbmt
           @logger = logger || Logger.new($stdout)
 
           @state_servlet = ProviderStateServlet.new(logger: @logger)
+          @message_servlet = MessageProviderServlet.new(logger: @logger)
           @thread = nil
         end
 
@@ -25,11 +27,16 @@ module Sbmt
           "http://#{@host}:#{@port}#{SETUP_PROVIDER_STATE_PATH}"
         end
 
+        def message_setup_url
+          "http://#{@host}:#{@port}#{VERIFY_MESSAGE_PATH}"
+        end
+
         def start
           raise "server already running, stop server before starting new one" if @thread
 
           @server = WEBrick::HTTPServer.new({BindAddress: @host, Port: @port}, WEBrick::Config::HTTP)
           @server.mount(SETUP_PROVIDER_STATE_PATH, @state_servlet)
+          @server.mount(VERIFY_MESSAGE_PATH, @message_servlet)
 
           @thread = Thread.new do
             Rails.logger.debug "starting provider setup server"
@@ -55,6 +62,10 @@ module Sbmt
           raise
         ensure
           stop
+        end
+
+        def add_message_handler(state_name, &block)
+          @message_servlet.add_message_handler(state_name, &block)
         end
 
         def add_setup_state(state_name, use_before_setup_hook = true, &block)

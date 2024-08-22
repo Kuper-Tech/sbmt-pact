@@ -58,35 +58,35 @@ module Sbmt
           self
         end
 
-        def with_request(method, path, query: nil, headers: nil, body: nil)
+        def with_request(method, path, query: {}, headers: {}, body: nil)
           interaction_part = PactFfi::FfiInteractionPart["INTERACTION_PART_REQUEST"]
-          PactFfi.with_request(pact_interaction, method.to_s, matcher_value_or_string(path))
+          PactFfi.with_request(pact_interaction, method.to_s, format_value(path))
 
-          with_parameters(query) do |key, index, value_item|
-            PactFfi.with_query_parameter_v2(pact_interaction, key, index, value_item)
+          InteractionContents.basic(query).each_pair do |key, value_item|
+            PactFfi.with_query_parameter_v2(pact_interaction, key.to_s, 0, format_value(value_item))
           end
 
-          with_parameters(headers) do |key, index, value_item|
-            PactFfi.with_header_v2(pact_interaction, interaction_part, key, index, value_item)
+          InteractionContents.basic(headers).each_pair do |key, value_item|
+            PactFfi.with_header_v2(pact_interaction, interaction_part, key.to_s, 0, format_value(value_item))
           end
 
           if body
-            PactFfi.with_body(pact_interaction, interaction_part, "application/json", JSON.dump(body))
+            PactFfi.with_body(pact_interaction, interaction_part, "application/json", format_value(InteractionContents.basic(body)))
           end
 
           self
         end
 
-        def with_response(status, headers: nil, body: nil)
+        def with_response(status, headers: {}, body: nil)
           interaction_part = PactFfi::FfiInteractionPart["INTERACTION_PART_RESPONSE"]
           PactFfi.response_status(pact_interaction, status)
 
-          with_parameters(headers) do |key, index, value_item|
-            PactFfi.with_header_v2(pact_interaction, interaction_part, key, index, value_item)
+          InteractionContents.basic(headers).each_pair do |key, value_item|
+            PactFfi.with_header_v2(pact_interaction, interaction_part, key.to_s, 0, format_value(value_item))
           end
 
           if body
-            PactFfi.with_body(pact_interaction, interaction_part, "application/json", JSON.dump(body))
+            PactFfi.with_body(pact_interaction, interaction_part, "application/json", format_value(InteractionContents.basic(body)))
           end
 
           self
@@ -132,21 +132,16 @@ module Sbmt
           handle
         end
 
-        def matcher_value_or_string(obj)
-          obj.is_a?(String) ? obj : JSON.dump(obj)
+        def format_value(obj)
+          return obj if obj.is_a?(String)
+
+          return JSON.dump({value: obj}) if obj.is_a?(Array)
+
+          JSON.dump(obj)
         end
 
         def full_description
           "#{DESCRIPTION_PREFIX}#{@description}"
-        end
-
-        def with_parameters(parameters)
-          parameters&.each do |key, value|
-            value_arr = value.is_a?(Array) ? value : [value]
-            value_arr.each_with_index do |value_item, index|
-              yield(key.to_s, index, matcher_value_or_string(value_item))
-            end
-          end
         end
       end
     end
