@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "pact_message_helpers"
 require_relative "webmock/webmock_helpers"
 
 module SbmtPactProducerDsl
@@ -12,6 +13,10 @@ module SbmtPactProducerDsl
 
     def grpc_pact_provider(provider, opts: {})
       _pact_provider(:grpc, provider, opts: opts)
+    end
+
+    def message_pact_provider(provider, opts: {})
+      _pact_provider(:async, provider, opts: opts)
     end
 
     def _pact_provider(transport_type, provider, opts: {})
@@ -48,6 +53,12 @@ module SbmtPactProducerDsl
     def provider_state(name, opts: {}, &block)
       raise PACT_PROVIDER_NOT_DECLARED_MESSAGE unless pact_config
       pact_config.new_provider_state(name, opts: opts, &block)
+    end
+
+    def handle_message(name, opts: {}, &block)
+      raise "message_pact_provider should be declared first" unless pact_config
+      raise "message_pact_provider should be declared first" unless pact_config.is_a?(Sbmt::Pact::Provider::PactConfig::Async)
+      pact_config.new_message_handler(name, opts: opts, &block)
     end
 
     def pact_config

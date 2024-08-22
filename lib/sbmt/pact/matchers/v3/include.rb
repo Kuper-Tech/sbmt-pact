@@ -5,10 +5,10 @@ module Sbmt
     module Matchers
       module V3
         class Include < Sbmt::Pact::Matchers::Base
-          def initialize(serializer, value)
-            raise MatcherInitializationError, "#{self.class}: #{value} should be an instance of String" unless value.is_a?(String)
+          def initialize(template)
+            raise MatcherInitializationError, "#{self.class}: #{template} should be an instance of String" unless template.is_a?(String)
 
-            super(spec_version: Sbmt::Pact::Matchers::PACT_SPEC_V3, serializer: serializer, kind: "include", value: value)
+            super(spec_version: Sbmt::Pact::Matchers::PACT_SPEC_V3, kind: "include", template: template)
           end
         end
       end

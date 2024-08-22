@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.11.0] - 2024-08-07
+
+### Added
+- async messages support
+- collection matchers
+- support of additional includes of proto-files for grpc plugin 
+
 ## [0.10.0] - 2024-08-15
 
 ### Added

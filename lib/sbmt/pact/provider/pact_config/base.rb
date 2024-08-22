@@ -55,6 +55,10 @@ module Sbmt
             @provider_setup_server.state_setup_url
           end
 
+          def message_setup_url
+            @provider_setup_server.message_setup_url
+          end
+
           def pact_broker_proxy_url
             @pact_proxy_server&.proxy_url
           end

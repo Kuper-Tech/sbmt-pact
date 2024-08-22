@@ -12,6 +12,8 @@ module Sbmt
             Http.new(provider_name: provider_name, opts: opts)
           when :grpc
             Grpc.new(provider_name: provider_name, opts: opts)
+          when :async
+            Async.new(provider_name: provider_name, opts: opts)
           else
             raise ArgumentError, "unknown transport_type: #{transport_type}"
           end

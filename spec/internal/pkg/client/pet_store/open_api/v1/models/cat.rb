@@ -136,7 +136,7 @@ module PetStore::OpenApi::V1
 
     # Deserializes the data based on type
     # @param string type Data type
-    # @param string value Value to be deserialized
+    # @param string template Value to be deserialized
     # @return [Object] Deserialized data
     def self._deserialize(type, value)
       case type.to_sym

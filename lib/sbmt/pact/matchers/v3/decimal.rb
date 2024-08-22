@@ -5,10 +5,10 @@ module Sbmt
     module Matchers
       module V3
         class Decimal < Sbmt::Pact::Matchers::Base
-          def initialize(serializer, value)
-            raise MatcherInitializationError, "#{self.class}: #{value} should be an instance of Float" unless value.is_a?(Float)
+          def initialize(template)
+            raise MatcherInitializationError, "#{self.class}: #{template} should be an instance of Float" unless template.is_a?(Float)
 
-            super(spec_version: Sbmt::Pact::Matchers::PACT_SPEC_V3, serializer: serializer, kind: "decimal", value: value)
+            super(spec_version: Sbmt::Pact::Matchers::PACT_SPEC_V3, kind: "decimal", template: template)
           end
         end
       end

@@ -2,6 +2,7 @@
 
 require "pact/ffi/verifier"
 require "sbmt/pact/native/logger"
+require "sbmt/pact/native/blocking_verifier"
 
 module Sbmt
   module Pact
@@ -41,7 +42,7 @@ module Sbmt
 
           logger.info("[verifier] starting provider verification")
 
-          result = PactFfi::Verifier.execute(pact_handle)
+          result = Sbmt::Pact::Native::BlockingVerifier.execute(pact_handle)
           if VERIFICATION_ERRORS[result].present?
             error = VERIFICATION_ERRORS[result]
             exception = VerificationError.new("There was an error while trying to verify provider \"#{@pact_config.provider_name}\"", error[:reason], error[:status])

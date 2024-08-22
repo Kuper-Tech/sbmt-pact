@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
+require_relative "pact_message_helpers"
+
 module SbmtPactConsumerDsl
+  include Sbmt::Pact::Matchers
+
   module ClassMethods
     def has_http_pact_between(consumer, provider, opts: {})
-      include Sbmt::Pact::Matchers::Basic
       _has_pact_between(:http, consumer, provider, opts: opts)
     end
 
     def has_grpc_pact_between(consumer, provider, opts: {})
-      include Sbmt::Pact::Matchers::Plugin
       _has_pact_between(:grpc, consumer, provider, opts: opts)
+    end
+
+    def has_message_pact_between(consumer, provider, opts: {})
+      _has_pact_between(:message, consumer, provider, opts: opts)
     end
 
     def _has_pact_between(transport_type, consumer, provider, opts: {})

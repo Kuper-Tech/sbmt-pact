@@ -44,6 +44,7 @@ module Sbmt
           @description = description || ""
 
           @proto_path = nil
+          @proto_include_dirs = []
           @service_name = nil
           @method_name = nil
           @request = nil
@@ -52,7 +53,7 @@ module Sbmt
           @provider_state_meta = nil
         end
 
-        def with_service(proto_path, method)
+        def with_service(proto_path, method, include_dirs = [])
           raise InteractionBuilderError.new("invalid grpc method: cannot be blank") if method.blank?
 
           service_name, method_name = method.split("/") || []
@@ -64,6 +65,7 @@ module Sbmt
           @proto_path = absolute_path
           @service_name = service_name
           @method_name = method_name
+          @proto_include_dirs = include_dirs.map { |dir| File.expand_path(dir) }
 
           self
         end
@@ -79,17 +81,17 @@ module Sbmt
         end
 
         def with_request(req_hash)
-          @request = req_hash
+          @request = InteractionContents.plugin(req_hash)
           self
         end
 
         def with_response(resp_hash)
-          @response = resp_hash
+          @response = InteractionContents.plugin(resp_hash)
           self
         end
 
         def with_response_meta(meta_hash)
-          @response_meta = meta_hash
+          @response_meta = InteractionContents.plugin(meta_hash)
           self
         end
 
@@ -100,6 +102,8 @@ module Sbmt
             "pact:content-type": CONTENT_TYPE,
             request: @request
           }
+
+          result["pact:protobuf-config"] = {additionalIncludes: @proto_include_dirs} if @proto_include_dirs.present?
 
           result[:response] = @response if @response.is_a?(Hash)
           result[:responseMetadata] = @response_meta if @response_meta.is_a?(Hash)
