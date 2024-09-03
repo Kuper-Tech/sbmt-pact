@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+ENV["RAILS_ENV"] = "test"
+
+# Engine root is used by rails_configuration to correctly
+# load fixtures and support files
+require "pathname"
+ENGINE_ROOT = Pathname.new(File.expand_path("..", __dir__))
+
+require "webmock"
+require "vcr"
+require "gruf/rspec"
+
 require "combustion"
 
 begin
@@ -15,4 +25,7 @@ rescue => e
   exit(1)
 end
 
-require "sbmt/dev/testing/rails_configuration"
+require "rspec/rails"
+# Add additional requires below this line. Rails is not loaded until this point!
+
+Dir["#{__dir__}/support/**/*.rb"].sort.each { |f| require f }

@@ -20,7 +20,7 @@ http_interactions:
       Keep-Alive:
       - '30'
       Host:
-      - paas-platform-paas-pact-broker.gw-stage.sbmt.io
+      - example.org
       Version:
       - HTTP/1.1
       X-Forwarded-For:

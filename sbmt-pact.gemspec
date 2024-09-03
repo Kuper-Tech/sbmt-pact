@@ -9,10 +9,10 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Pact contract testing helpers"
   spec.description = spec.summary
-  spec.homepage = "https://gitlab.sbmt.io/nstmrt/rubygems/sbmt-pact"
+  spec.homepage = "https://github.com/Kuper-Tech/sbmt-pact"
   spec.required_ruby_version = ">= 2.7.0"
 
-  spec.metadata["allowed_push_host"] = "https://nexus.sbmt.io"
+  spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
@@ -40,8 +40,18 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "combustion", ">= 1.3"
   spec.add_development_dependency "rake", ">= 13.0"
   spec.add_development_dependency "sbmt-app", ">= 1.43.1"
-  spec.add_development_dependency "sbmt-dev", ">= 0.17.2"
   spec.add_development_dependency "sbmt-kafka_consumer", ">= 2.0.1"
   spec.add_development_dependency "sbmt-kafka_producer", ">= 1.0"
   spec.add_development_dependency "dry-monads", "~> 1.3"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "rspec_junit_formatter"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "rubocop-rails"
+  spec.add_development_dependency "rubocop-rspec"
+  spec.add_development_dependency "rubocop-performance"
+  spec.add_development_dependency "standard", ">= 1.35.1"
+  spec.add_development_dependency "vcr", ">= 6.0"
+  spec.add_development_dependency "webmock", ">= 3.0"
+  spec.add_development_dependency "gruf-rspec", ">= 0.6.0"
 end

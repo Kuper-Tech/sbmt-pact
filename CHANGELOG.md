@@ -11,12 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Remove sbmt-dev
+
 ### Fixed
 
 ## [0.11.1] - 2024-08-22
 
 ### Fixed
-- the `verify_only` config option is now set based on the `PACT_CONSUMER_FULL_NAME` environment variable. 
+- the `verify_only` config option is now set based on the `PACT_CONSUMER_FULL_NAME` environment variable.
 - if the current `consumer_name` does not match the `verify_only` option, then the consumer verification is skipped
 
 ## [0.11.0] - 2024-08-07
@@ -24,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - async messages support
 - collection matchers
-- support of additional includes of proto-files for grpc plugin 
+- support of additional includes of proto-files for grpc plugin
 
 ## [0.10.0] - 2024-08-15
 

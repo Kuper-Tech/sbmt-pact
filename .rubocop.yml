@@ -1,12 +1,62 @@
-inherit_gem:
-  sbmt-dev: config/rubocop.yml
+# We want Exclude directives from different
+# config files to get merged, not overwritten
+inherit_mode:
+  merge:
+    - Exclude
 
 AllCops:
   TargetRubyVersion: 2.7
   TargetRailsVersion: 6.0
+  NewCops: enable
+  SuggestExtensions: false
   Exclude:
-    - spec/internal/pkg/client/**/*
+    - spec/internal/pkg/**/*
 
-Rails/OverridingEnvVars:
+require:
+  # Performance cops are bundled with Standard
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rspec
+  # Standard's config uses custom cops,
+  # so it must be loaded
+  - standard
+
+inherit_gem:
+  standard: config/base.yml
+
+# rubocop-rails
+Rails/SkipsModelValidations:
+  Enabled: false
+
+# rubocop-rspec
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Max: 10
+
+RSpec/ExampleLength:
+  Max: 70
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 15
+
+RSpec/DescribeClass:
   Exclude:
-    - spec/spec_helper.rb
+    - spec/sbmt/pact/tasks/*
+
+RSpec/EmptyExampleGroup:
+  Exclude:
+    - spec/pact/**/*
