@@ -26,7 +26,7 @@ module Sbmt
         }.freeze
 
         # env below are set up by pipeline-builder
-        # see https://gitlab.sbmt.io/paas/cicd/images/pact/pipeline-builder/-/blob/master/internal/commands/consumers-pipeline/ruby.go
+        # see paas/cicd/images/pact/pipeline-builder/-/blob/master/internal/commands/consumers-pipeline/ruby.go
         def initialize(pact_config)
           raise ArgumentError, "pact_config must be a subclass of Sbmt::Pact::Provider::PactConfig::Base" unless pact_config.is_a?(::Sbmt::Pact::Provider::PactConfig::Base)
           @pact_config = pact_config

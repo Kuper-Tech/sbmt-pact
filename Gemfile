@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
-source "https://nexus.sbmt.io/repository/rubygems/"
+source ENV.fetch("RUBYGEMS_PUBLIC_SOURCE", "https://rubygems.org/")
 
 gemspec
 
-source "https://nexus.sbmt.io/repository/ruby-gems-sbermarket/" do
+source ENV.fetch("RUBYGEMS_PRIVATE_SOURCE", "https://nexus.sbmt.io/repository/ruby-gems-sbermarket/") do
   group :development, :test do
     gem "sbmt-app"
-    gem "sbmt-dev"
   end
-end
-
-group :development, :test do
-  # https://jira.sbmt.io/browse/DEX-2404
-  gem "sidekiq", "< 7.3.0"
 end

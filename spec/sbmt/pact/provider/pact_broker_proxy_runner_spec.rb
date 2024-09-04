@@ -29,7 +29,7 @@ describe Sbmt::Pact::Provider::PactBrokerProxyRunner do
         descriptions = response.body["interactions"].pluck("description")
 
         expect(response.status).to eq(200)
-        expect(response.headers["content-length"]).to eq("9462")
+        expect(response.headers["content-length"]).to eq("8670")
         expect(descriptions).to eq(["grpc: ", "grpc: "])
       end
     end
@@ -42,7 +42,7 @@ describe Sbmt::Pact::Provider::PactBrokerProxyRunner do
         descriptions = response.body["interactions"].pluck("description")
 
         expect(response.status).to eq(200)
-        expect(response.headers["content-length"]).to eq("9450")
+        expect(response.headers["content-length"]).to eq("8658")
         expect(descriptions).to eq(["", ""])
       end
     end
@@ -56,7 +56,7 @@ describe Sbmt::Pact::Provider::PactBrokerProxyRunner do
       VCR.use_cassette "pact-broker/for_verification" do
         response = make_request
         expect(response.status).to eq(200)
-        expect(response.headers["content-length"]).to eq("2997")
+        expect(response.headers["content-length"]).to eq("2817")
       end
     end
   end

@@ -1,6 +1,6 @@
 ARG RUBY_VERSION
 
-FROM dreg.sbmt.io/dhub/library/ruby:$RUBY_VERSION
+FROM ruby:$RUBY_VERSION
 
 ARG BUNDLER_VERSION
 ARG RUBYGEMS_VERSION
@@ -12,4 +12,3 @@ RUN gem update --system "${RUBYGEMS_VERSION}" \
   && rm /usr/local/lib/ruby/gems/*/specifications/default/bundler*.gemspec \
   && gem install --default bundler:${BUNDLER_VERSION} \
   && gem install bundler -v ${BUNDLER_VERSION}
-

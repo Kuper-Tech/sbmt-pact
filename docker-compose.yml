@@ -20,7 +20,7 @@ services:
       - bundler_data:/usr/local/bundle
 
   pact-broker:
-    image: dreg.sbmt.io/dhub/pactfoundation/pact-broker
+    image: pactfoundation/pact-broker
     ports:
       - 9292
     environment:
@@ -29,7 +29,7 @@ services:
       PACT_BROKER_LOG_LEVEL: DEBUG
 
   pact-cli:
-    image: dreg.sbmt.io/dhub/pactfoundation/pact-cli
+    image: pactfoundation/pact-cli
     working_dir: /app
     depends_on:
       - pact-broker
