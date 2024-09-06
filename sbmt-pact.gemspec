@@ -4,11 +4,12 @@ require_relative "lib/sbmt/pact/version"
 
 Gem::Specification.new do |spec|
   spec.name = "sbmt-pact"
+  spec.license = "MIT"
   spec.version = Sbmt::Pact::VERSION
-  spec.authors = ["Ruby Platform Team"]
+  spec.authors = ["Kuper Ruby Platform Team"]
 
-  spec.summary = "Pact contract testing helpers"
-  spec.description = spec.summary
+  spec.summary = "Ruby gem for simplified Pact testing between microservices, supporting the latest Pact specifications and multiple transport protocols"
+  spec.description = "It is a powerful Ruby gem designed to streamline Pact testing in microservice architectures. It supports the latest Pact specifications and offers capabilities beyond the current pact-ruby gem, including support for non-HTTP transports like gRPC and async messaging systems like Kafka."
   spec.homepage = "https://github.com/Kuper-Tech/sbmt-pact"
   spec.required_ruby_version = ">= 2.7.0"
 
@@ -16,7 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
-  spec.metadata["changelog_uri"] = "#{spec.homepage}/-/blob/master/CHANGELOG.md"
+  spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/master/CHANGELOG.md"
   spec.metadata["rubygems_mfa_required"] = "false" # rubocop:disable Gemspec/RequireMFA
 
   # Specify which files should be added to the gem when it is released.

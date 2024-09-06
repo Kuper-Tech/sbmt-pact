@@ -1,69 +1,72 @@
 # Sbmt Pact
 
-## Функционал
+**`sbmt-pact`** is a powerful Ruby gem designed to simplify and streamline [Pact](https://docs.pact.io/) testing between microservices. This gem provides a robust set of RSpec utilities to help developers implement consumer-driven contract testing in microservice architectures.
 
-На данный момент существующая версия гема `pact-ruby` поддерживает [Pact Specification](https://github.com/pact-foundation/pact-specification) лишь версий v1 и v2, что не позволяет:
-- написание контрактных тестов для async messages (kafka, etc)
-- написание контрактных тестов с отличными от http транспортами (например, grpc)
+In the world of microservices, ensuring seamless communication between services is crucial. This gem leverages the Pact to enable effective contract testing, allowing you to catch integration issues early in the development cycle. Contract testing is a way to check if different parts of a system work well together. It's like making sure two puzzle pieces fit perfectly before assembling the whole puzzle. Each part is tested on its own to see if it follows a set of rules (the "contract") that everyone agreed on. This helps catch problems early and makes sure all parts of the system speak the same language.
 
-Гем `pact-ruby` более не поддерживается меинтейнерами, так как произошел переход к [rust-core](https://github.com/pact-foundation/pact-reference), который в отличных от rust стеков предполагается использовать через FFI
+## Motivation
 
-Данный гем позволяет избавиться от вышеперечисленных недостатков и реализует поддержку последних версий pact-спецификаций:
-- базируется на [pact-ffi](https://github.com/pact-foundation/pact-reference/releases) и [pact-ruby-ffi](https://github.com/YOU54F/pact-ruby-ffi)
-- предоставляет удобный DSL, упрощающий написание контрактных тестов в ruby/rspec
-- поддерживает pact-broker и существующие gitlab-пайплайны в PaaS
+Currently, the existing version of the [pact-ruby](https://github.com/pact-foundation/pact-ruby) gem only supports Pact Specification versions v1 and v2, which doesn't allow for:
+- Writing contract tests with non-HTTP transports (for example, gRPC)
+- Writing contract tests for async messages (Kafka, etc.)
 
-## Архитектура
+The `pact-ruby` gem is in maintenance mode, as there has been a transition to rust-core, which is intended to be used through FFI in non-Rust stacks.
 
-![Архитектура](docs/sbmt-pact-arch.png)
+This gem eliminates the above-mentioned limitations and implements support for the latest versions of Pact specifications:
+- It's based on pact-ffi and pact-ruby-ffi
+- It provides a convenient DSL, simplifying the writing of contract tests in Ruby/RSpec
 
-- DSL - реализация rspec-DSL для удобства написания пакт-тестов
-- matchers - реализация пакт-матчеров, представляет собой удобные хелперы, используемые в consumer-DSL, инкапсулирующие в себе всю логику сериализации в pact-формат
-- mock servers - мок-серверы, которые позволяют корректно запускать провайдер-тесты
+## Architecture
 
-## DSL консюмер-тестов
+![Pact tests architecture](docs/sbmt-pact-arch.png)
 
-Для каждого типа взаимодействий (из-за их особенностей) реализована своя версия DSL, однако общие принципы одинаковы для каждого типа взаимодействий
+- DSL - implementation of RSpec-DSL for convenient writing of Pact tests
+- Matchers - implementation of Pact matchers, which are convenient helpers used in consumer-DSL, encapsulating all the logic for serialization into Pact format
+- Mock servers - mock servers that allow for correct execution of provider tests
+
+## Usage
+
+For each type of interaction (due to their specific features), a separate version of DSL has been implemented. However, the general principles remain the same for each type of interaction.
 
 ```ruby
 
-# декларация консюмер-теста, обязательно указываем  тэг :pact,
-# это используется в CI/CD пайплайнах для разделения пакт-тестов от остальных rspec
-# пакт-тесты не запускаются в рамках общего пайплайна rspec
+# Declaration of a consumer test, always include the :pact tag
+# This is used in CI/CD pipelines to separate Pact tests from other RSpec tests
+# Pact tests are not run as part of the general RSpec pipeline
 RSpec.describe "SomePactConsumerTestForAnyTransport", :pact do
-  # декларация типа взаимодействия - тут определяем, какие консюмер и провайдер по какому транспорту взаимодействуют
+  # declaration of the type of interaction - here we determine which consumer and provider interact on which transport
   has_http_pact_between "CONSUMER-NAME", "PROVIDER-NAME"
-  # или
+  # or
   has_grpc_pact_between "CONSUMER-NAME", "PROVIDER-NAME"
-  # или
+  # or
   has_message_pact_between "CONSUMER-NAME", "PROVIDER-NAME"
 
-  # контекст для одного из взаимодействий, например GET /api/v2/stores
+  # the context for one of the interactions, for example GET /api/v2/stores
   context "with GET /api/v2/stores" do
       let(:interaction) do
-        # создаем новой взаимодействие - в рамках которого описываем контракт
+        # creating a new interaction - within which we describe the contract
         new_interaction
-          # если необходимо сохранить какие-либо метаданные для последующего их использования провайдер-тестом,
-          # например, указать ID сущности, которую нужно будет предсоздать в БД в провайдер-тесте
-          # используем provider states - см. https://docs.pact.io/getting_started/provider_states
+          # if you need to save any metadata for subsequent use by the test provider,
+          # for example, specify the entity ID that will need to be moved to the database in the test provider
+          # we use the provider states, see more at https://docs.pact.io/getting_started/provider_states
           .given("UNIQUE PROVIDER STATE", key1: value1, key2: value2)
-          # описание взаимодействия, используется для идентификации внутри пакт-обвязки, 
-          # в некоторых случаях опционально, но рекомендуется указывать всегда
+          # the description of the interaction, used for identification inside the package binding,
+          # is optional in some cases, but it is recommended to always specify
           .upon_receiving("UNIQUE INTERACTION DESCRIPTION")
-          # описание запроса с использованием матчеров
-          # имя и параметры метода отличаются для разных транспортов, подробнее см. отдельные разделы
+          # the description of the request using the matchers
+          # the name and parameters of the method differ for different transports
           .with_request(...)
-          # описание ответа с использованием матчеров
-          # имя и параметры метода отличаются для разных транспортов, подробнее см. отдельные разделы
+          # the description of the response using the matchers
+          # the name and parameters of the method differ for different transports
           .with_response(...)
-          # далее есть отличия для разных типов транспортов, подробнее см. отдельные разделы
+          # further, there are differences for different types of transports,
+          # for more information, see the relevant sections of the documentation
       end
 
       it "executes the pact test without errors" do
         interaction.execute do
-          # тут происходит вызов нашего клиента для тестируемого API
-          # в данном контексте клиентом может быть: http-клиент, grpc-клиент, кафка-консюмер
-          # подробнее см. отдельные разделы
+          # here our client is called for the API being tested
+          # in this context, the client can be: http client, grpc client, kafka consumer
           expect(make_request).to be_success
         end
       end
@@ -72,141 +75,137 @@ RSpec.describe "SomePactConsumerTestForAnyTransport", :pact do
 
 ```
 
-Общие методы DSL:
-- `new_interaction` - инициализирует новое взаимодействие
-- `given` - позволяет указать provider state с параметрами и без, подробнее см. в https://docs.pact.io/getting_started/provider_states
-- `upon_receiving` - позволяет указать название взаимодействия
+Common DSL Methods:
+- `new_interaction` - initializes a new interaction
+- `given` - allows specifying a provider state with or without parameters, for more details see https://docs.pact.io/getting_started/provider_states
+- `upon_receiving` - allows specifying the name of the interaction
 
-### DSL http-консюмеров
+### HTTP consumers
 
-Специфичные методы DSL:
-- `with_request(HTTP_METHOD, QUERY_PATH, {headers: kv_hash, body: kv_hash})` - описание запроса
-- `with_response(HTTP_STATUS, {headers: kv_hash, body: kv_hash})` - описание ответа
+Specific DSL methods:
+- `with_request(HTTP_METHOD, QUERY_PATH, {headers: kv_hash, body: kv_hash})` - request definition
+- `with_response(HTTP_STATUS, {headers: kv_hash, body: kv_hash})` - response definition
 
-Подробнее в [http_client_spec.rb](spec/pact/providers/sbmt-pact-test-app/http_client_spec.rb)
+More at [http_client_spec.rb](spec/pact/providers/sbmt-pact-test-app/http_client_spec.rb)
 
-### DSL grpc-консюмеров
+### gRPC consumers
 
-Специфичные методы DSL:
-- `with_service(PROTO_PATH, RPC_SERVICE_AND_ACTION)` - указывает используемый контракт, PROTO_PATH - относительный от Rails.root
-- `with_request(request_kv_hash)` - описание запроса
-- `with_response(response_kv_hash)` - описание ответа
+Specific DSL methods:
+- `with_service(PROTO_PATH, RPC_SERVICE_AND_ACTION)` - specifies the contract used, PROTO_PATH is relative from the app root
+- `with_request(request_kv_hash)` - request definition
+- `with_response(response_kv_hash)` - response definition
 
-Подробнее в [grpc_client_spec.rb](spec/pact/providers/sbmt-pact-test-app/grpc_client_spec.rb)
+More at [grpc_client_spec.rb](spec/pact/providers/sbmt-pact-test-app/grpc_client_spec.rb)
 
-### DSL kafka-консюмеров
+### Kafka consumers
 
-Специфичные методы DSL:
-- `with_headers(kv_hash)` - для указания кафка-хедеров, можно использовать матчеры
-- `with_metadata(kv_hash)` - для указания метаданных (специальные ключи `key` и `topic`, где соотв-но можно указать матчеры для ключа партиционирования и топика в кафке)
+Specific DSL methods:
+- `with_headers(kv_hash)` - message-headers definition; you can use matchers
+- `with_metadata(kv_hash)` - message-metadata definition (special keys are `key` and `topic`, where, respectively, you can specify the matchers for the partitioning key and the topic
 
-Далее специфика - один из двух вариантов описания формата:
-JSON (для описания сообщения в JSON представлении):
-- `with_json_contents(kv_hash)` - описание формата сообщения
+Next, the specifics are one of two options for describing the format:
 
-PROTO (для описания сообщения в protobuf представлении):
-- `with_proto_class(PROTO_PATH, PROTO_MESSAGE_NAME)` - указывает используемый контракт, PROTO_PATH - относительный от Rails.root, PROTO_MESSAGE_NAME - название используемого message из proto-файла
-- `with_proto_contents(kv_hash)` - описание формата сообщения
+**JSON** (to describe a message in a JSON representation):
+- `with_json_contents(kv_hash)` - message format definition
 
-Подробнее в [kafka_spec.rb](spec/pact/providers/sbmt-pact-test-app/kafka_spec.rb)
+**PROTO** (to describe the message in the protobuf view):
+- `with_proto_class(PROTO_PATH, PROTO_MESSAGE_NAME)` - specifies the contract used, PROTO_PATH is relative to the root, PROTO_MESSAGE_NAME is the name of the message used from the proto file
+- `with_proto_contents(kv_hash)` - message format definition
 
-### Матчеры
+More at [kafka_spec.rb](spec/pact/providers/sbmt-pact-test-app/kafka_spec.rb)
 
-Матчеры - это специальные хелпер-методы, позволяющие на уровне пакт-манифеста определять правила соответствия параметров запросов / ответов.
-Матчеры описаны в спецификациях пакт, подробнее см. в https://github.com/pact-foundation/pact-specification
-В данном геме матчеры реализованы в виде rspec-хелперов.
+### Matchers
 
-Детали реализации см. в [matchers.rb](lib/sbmt/pact/matchers.rb)
+Matchers are special helper methods that allow you to define rules for matching request/response parameters at the level of the pact manifest.
+The matchers are described in the [Pact specifications](https://github.com/pact-foundation/pact-specification). In this gem, the matchers are implemented as RSpec helpers.
 
-- `match_exactly(sample)` - позволяет матчить точное значение, указанное в sample
-- `match_type_of(sample)` - позволяет матчить тип данных (integer, string, boolean), указанный в sample
-- `match_include(sample)` - позволяет матчить подстроку
-- `match_any_string(sample)` - позволяет матчить любую строку, из-за особенностей тут также будут сматчены null и пустые строки
-- `match_any_integer(sample)` - позволяет матчить любой integer
-- `match_any_decimal(sample)` - позволяет матчить float/double
-- `match_any_number(sample)` - позволяет матчить любой integer, float, double
-- `match_any_boolean(sample)` - позволяет матчить boolean значения true/false
-- `match_uuid(sample)` - позволяет матчить UUID (под капотом используется `match_regex`)
-- `match_regex(regex, sample)` - позволяет матчить по regexp
-- `match_datetime(format, sample)` - позволяет матчить подстроку
-- `match_iso8601(sample)` - позволяет матчить формат ISO8601 (матчер не полностью соответствует ISO8601, матчит только самые распространенные варианты, под капотом используется `match_regex`)
-- `match_date(format, sample)` - позволяет матчить дату по формату (rust datetime)
-- `match_time(format, sample)` - позволяет матчить время по формату (rust datetime)
-- `match_each(template)` - позволяет матчить все элементы массива по указанному template, можно использовать для вложенных элементов
-- `match_each_regex(regex, sample)` - позволяет матчить все элементы массива по regex, используется для массивов со строковыми элементами
-- `match_each_key(template, key_matchers)` - позволяет матчить каждый ключ хэша по указанному template
-- `match_each_value(template)` - позволяет матчить каждое значение хэша по указанному template, можно использовать для вложенных элементов
-- `match_each_kv(template, key_matchers)` - позволяет матчить все ключи/значения хэша по указанным template и key_matchers, можно использовать для вложенных элементов
+For details of the implementation, see [matchers.rb](lib/sbmt/pact/matchers.rb)
 
-См. разные варианты использования матчеров в [matchers_spec.rb](spec/sbmt/pact/matchers_spec.rb)
+- `match_exactly(sample)` - match the exact value specified in the sample
+- `match_type_of(sample)` - match the data type (integer, string, boolean) specified in the sample
+- `match_include(sample)` - match a substring
+- `match_any_string(sample)` - match any string, because of the peculiarities, null and empty strings will also be matched here
+- `match_any_integer(sample)` - match any integer
+- `match_any_decimal(sample)` - match any float/double
+- `match_any_number(sample)` - match any integer/float/double
+- `match_any_boolean(sample)` - match any true/false
+- `match_uuid(sample)` - match any UUID (`match_regex` is used under the hood)
+- `match_regex(regex, sample)` - match by regexp
+- `match_datetime(format, sample)` - match any datetime
+- `match_iso8601(sample)` - match datetime in ISO8601 (the matcher does not fully comply with ISO8601, matches only the most common variants, `match_regex` is used under the hood)
+- `match_date(format, sample)` - match any date (rust datetime)
+- `match_time(format, sample)` - match any time (rust datetime)
+- `match_each(template)` - match all the elements of the array according to the specified template, you can use it for nested elements
+- `match_each_regex(regex, sample)` - match all array elements by regex, used for arrays with string elements
+- `match_each_key(template, key_matchers)` - match each hash key according to the specified template
+- `match_each_value(template)` - match each hash value according to the specified template, can be used for nested elements
+- `match_each_kv(template, key_matchers)` - match all the keys/values of Hash according to the specified template and key_matchers, can be used for nested elements
 
-## Разработка
+See the different uses of the matchers in [matchers_spec.rb](spec/sbmt/pact/matchers_spec.rb)
 
-### Локальное окружение
+## Development & Test
 
-#### Подготовка рабочего окружения
+Install [Dip](https://github.com/bibendi/dip)
+
+### Setup
+
 ```shell
 dip provision
 ```
 
-#### Запуск unit-тестов
+### Run unit tests
+
 ```shell
 dip rspec
 ```
 
-#### Запуск pact-тестов
+### Run pact tests
 
-Pact-тесты не запускаются в рамках общего rspec, их нужно запускать отдельно, см. ниже
+The Pact tests are not run within the general rspec pipeline, they need to be run separately, see below
 
-##### Тесты консюмеров
+#### Consumer tests
 
 ```shell
 dip pact consumer
-```
-
-или
-
-```shell
+# or
 bundle exec rspec -t pact spec/pact/providers/**/*_spec.rb
 ```
 
-P.S. если ни разу не запускались - нужно запустить хотя бы раз, чтобы сгенерировать json-pact-манифесты, которые будут использоваться в провайдер-тестах (ниже)
+**NOTE** If you have never run it, you need to run it at least once to generate json-pact manifests that will be used in provider tests (below)
 
-##### Тесты провайдера
+#### Provider tests
 
 ```shell
 dip pact provider
-```
-
-или
-
-```shell
+# or
 bundle exec rspec -t pact spec/pact/consumers/*_spec.rb
 ```
 
-##### Локальное использование pact-брокера
+#### Using Pact Broker locally
 
-Если необходимо проверить возможность работать с пакт-брокером локально, нужно сделать следующее:
-- поднять брокер
+If you need to check the ability to work with a package broker locally, you need to do the following:
+
+- Run the broker
 
 ```shell
 $ dip up pact-broker
 ```
 
-- прогнать consumer-тесты, чтобы сгенерировать pact-манифест (будет создан в `spec/internal/pacts` по результатам успешного прохождения консюмер-тестов)
+- Run consumer tests to generate a pact manifest (it will be created in `spec/internal/pacts` based on the results of successful completion of consumer tests)
 
 ```shell
 $ dip pact consumer
 ```
 
-- опубликовать сгенерированный pact-манифест в pact-брокере
+- Publish the generated pact manifest in the pact broker
 
 ```shell
 $ dip pact-cli publish
 ```
 
-- для информации можно убедиться, что манифест опубликован, открыв в браузере http://localhost:9292 (не забыв пробросить порт 9292 на localhost, см. `docker-compose.yml`)
-- запустить тесты провайдера, используя pact-брокер
+- Make sure that the manifest is published by opening it in a browser http://localhost:9292 (don't forget to forward port 9292 to localhost, see `docker-compose.yml`)
+
+- run provider tests using a pact broker
 
 ```shell
 $ dip pact provider-with-local-broker
