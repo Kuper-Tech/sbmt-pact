@@ -3,7 +3,6 @@
 describe Sbmt::Pact::Provider::ProviderServerRunner do
   let(:http_client) do
     Faraday.new do |conn|
-      Sbmt::App::Http.configure_faraday(conn, name: "http-client")
       conn.response :json
       conn.request :json
     end

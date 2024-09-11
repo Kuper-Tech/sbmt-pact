@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
 require "sbmt/pact/rspec"
-require "internal/config/configs/pet_store_grpc_config"
 
 RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", :pact do
-  include Anyway::Testing::Helpers
-
   has_grpc_pact_between "sbmt-pact-test-app", "sbmt-pact-test-app"
 
   let(:pet_id) { 123 }
 
-  let(:api) { PetStore::Grpc::PetStore::V1::PetsApi.new }
-  let(:make_request) { api.pet_by_id(id: pet_id) }
+  let(:api) { ::PetStore::Grpc::PetStore::V1::Pets::Stub.new("localhost:3009", :this_channel_is_insecure) }
+  let(:make_request) { api.pet_by_id(PetStore::Grpc::PetStore::V1::PetByIdRequest.new(id: pet_id)) }
 
   let(:interaction) do
     new_interaction
@@ -33,7 +30,7 @@ RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", :pact do
 
       it "executes the pact test without errors" do
         interaction.execute do
-          expect(make_request).to be_success
+          expect { make_request }.not_to raise_error
         end
       end
     end

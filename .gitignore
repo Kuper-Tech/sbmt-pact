@@ -15,3 +15,5 @@ lefthook-local.yml
 /gemfiles/*gemfile*
 /spec/internal/log/*.log
 /spec/internal/pacts
+test.log
+

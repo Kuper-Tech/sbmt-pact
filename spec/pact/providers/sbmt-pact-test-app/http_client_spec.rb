@@ -1,19 +1,24 @@
 # frozen_string_literal: true
 
 require "sbmt/pact/rspec"
-require "internal/config/configs/pet_store_open_api_config"
 
 RSpec.describe "Sbmt::Pact::Providers::Test::HttpClient", :pact do
-  include Anyway::Testing::Helpers
-
   has_http_pact_between "sbmt-pact-test-app", "sbmt-pact-test-app"
 
   let(:pet_id) { 123 }
-  let(:api) { PetStore::OpenApi::V1::PetsApi.new }
+  let(:host) { "localhost:3000" }
   let(:interaction) { new_interaction }
+  let(:http_client) do
+    Faraday.new do |conn|
+      conn.response :json
+      conn.request :json
+    end
+  end
 
   context "with GET /pets/:id" do
-    let(:make_request) { api.pets_id_get(pet_id) }
+    let(:make_request) do
+      http_client.get("http://#{host}/pets/#{pet_id}")
+    end
 
     context "with successful interaction" do
       let(:interaction) do
@@ -39,8 +44,10 @@ RSpec.describe "Sbmt::Pact::Providers::Test::HttpClient", :pact do
   end
 
   context "with PATCH /pets" do
-    let(:make_request) { api.pets_id_patch(pet_id, pet: pet, header_params: {"Authorization" => "some-token"}) }
-    let(:pet) { PetStore::OpenApi::V1::Dog.new(pet_data) }
+    let(:make_request) do
+      http_client.patch("http://#{host}/pets/#{pet_id}", pet_data.to_json,
+        {"Authorization" => "some-token"})
+    end
     let(:pet_data) { {breed: "Shepherd"} }
 
     context "with successful interaction" do

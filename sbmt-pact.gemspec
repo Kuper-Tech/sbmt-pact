@@ -33,17 +33,17 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "zeitwerk", "~> 2.3"
   spec.add_dependency "pact-ffi", "~> 0.4.22"
+  spec.add_dependency "rack", "~> 2.0"
   spec.add_dependency "webrick"
   spec.add_dependency "rack-proxy"
 
   spec.add_development_dependency "appraisal", ">= 2.4"
   spec.add_development_dependency "bundler", ">= 2.3"
   spec.add_development_dependency "combustion", ">= 1.3"
+  spec.add_development_dependency "gruf", ">= 2.18"
   spec.add_development_dependency "rake", ">= 13.0"
-  spec.add_development_dependency "sbmt-app", ">= 1.43.1"
   spec.add_development_dependency "sbmt-kafka_consumer", ">= 2.0.1"
   spec.add_development_dependency "sbmt-kafka_producer", ">= 1.0"
-  spec.add_development_dependency "dry-monads", "~> 1.3"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rspec_junit_formatter"
@@ -53,6 +53,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-performance"
   spec.add_development_dependency "standard", ">= 1.35.1"
   spec.add_development_dependency "vcr", ">= 6.0"
+  spec.add_development_dependency "faraday", "> 1.0"
   spec.add_development_dependency "webmock", ">= 3.0"
   spec.add_development_dependency "gruf-rspec", ">= 0.6.0"
 end
