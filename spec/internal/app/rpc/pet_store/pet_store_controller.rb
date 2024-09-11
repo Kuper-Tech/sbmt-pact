@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module PetStore
-  class PetStoreController < Sbmt::App::Gruf::Server::Controller
+  class PetStoreController < Gruf::Controllers::Base
     bind PetStore::Grpc::PetStore::V1::Pets::Service
 
     def pet_by_id

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "sbmt/kafka_producer"
-
 class PetJsonProducer < Sbmt::KafkaProducer::BaseProducer
   option :topic, default: -> { "json-topic" }
   option :uuid, default: -> { SecureRandom.uuid }

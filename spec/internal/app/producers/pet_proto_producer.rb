@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "sbmt/kafka_producer"
-
 class PetProtoProducer < Sbmt::KafkaProducer::BaseProducer
   option :topic, default: -> { "proto-topic" }
   option :uuid, default: -> { SecureRandom.uuid }

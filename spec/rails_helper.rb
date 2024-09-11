@@ -9,7 +9,10 @@ ENGINE_ROOT = Pathname.new(File.expand_path("..", __dir__))
 
 require "webmock"
 require "vcr"
+require "faraday"
+require "gruf"
 require "gruf/rspec"
+require "yabeda" # we have to require it becase of this https://github.com/yabeda-rb/yabeda/pull/38
 
 require "combustion"
 
@@ -26,6 +29,11 @@ rescue => e
 end
 
 require "rspec/rails"
+
 # Add additional requires below this line. Rails is not loaded until this point!
 
 Dir["#{__dir__}/support/**/*.rb"].sort.each { |f| require f }
+
+# Optional dependencies
+require "sbmt/kafka_consumer"
+require "sbmt/kafka_producer"
