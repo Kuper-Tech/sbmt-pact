@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 describe Sbmt::Pact::Provider::GrufServer do
-  let(:api) { ::PetStore::Grpc::PetStore::V1::Pets::Stub.new("localhost:3009", :this_channel_is_insecure) }
+  let(:api) { ::PetStore::Grpc::PetStore::V1::Pets::Stub.new("127.0.0.1:3009", :this_channel_is_insecure) }
   let(:call_rpc) do
     subject.run { api.pet_by_id(PetStore::Grpc::PetStore::V1::PetByIdRequest.new(id: 1)) }
   end

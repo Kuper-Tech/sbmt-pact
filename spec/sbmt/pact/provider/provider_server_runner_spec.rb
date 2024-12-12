@@ -9,7 +9,7 @@ describe Sbmt::Pact::Provider::ProviderServerRunner do
   end
 
   let(:make_request) do
-    server.run { http_client.post("http://localhost:9001/setup-provider", request_body) }
+    server.run { http_client.post("http://127.0.0.1:9001/setup-provider", request_body) }
   end
 
   let(:server) do
