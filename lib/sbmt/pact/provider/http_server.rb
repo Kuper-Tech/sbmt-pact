@@ -12,7 +12,7 @@ module Sbmt
 
           @server_pid = nil
 
-          @host = @options[:host] || "localhost"
+          @host = @options[:host] || "127.0.0.1"
           @logger = @options[:logger] || ::Logger.new($stdout)
         end
 

@@ -7,7 +7,7 @@ RSpec.describe "Sbmt::Pact::Providers::Test::GrpcClient", :pact do
 
   let(:pet_id) { 123 }
 
-  let(:api) { ::PetStore::Grpc::PetStore::V1::Pets::Stub.new("localhost:3009", :this_channel_is_insecure) }
+  let(:api) { ::PetStore::Grpc::PetStore::V1::Pets::Stub.new("127.0.0.1:3009", :this_channel_is_insecure) }
   let(:make_request) { api.pet_by_id(PetStore::Grpc::PetStore::V1::PetByIdRequest.new(id: pet_id)) }
 
   let(:interaction) do

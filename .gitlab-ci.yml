@@ -23,10 +23,24 @@ tests:
   variables:
     POSTGRES_HOST_AUTH_METHOD: trust
     DATABASE_URL: postgres://postgres:secret@postgres:5432
+    PACT_DO_NOT_TRACK: true
   parallel:
     matrix:
       - RUBY_VERSION: ['2.7', '3.0', '3.1', '3.2', '3.3']
   before_script:
+    - |
+      https_proxy=${INTERNAL_WEB_PROXY} curl -LO https://github.com/pact-foundation/pact-plugins/releases/download/pact-plugin-cli-v0.0.0/pact-plugin-cli-linux-x86_64.gz && \
+      gunzip pact-plugin-cli-linux-x86_64.gz && \
+      chmod +x pact-plugin-cli-linux-x86_64 && \
+      mv pact-plugin-cli-linux-x86_64 /usr/local/bin/pact-plugin-cli && \
+      https_proxy=${INTERNAL_WEB_PROXY} pact-plugin-cli -y install https://github.com/pactflow/pact-protobuf-plugin/releases/tag/v-0.4.0
+    - |
+      https_proxy=${INTERNAL_WEB_PROXY} curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protoc-21.12-linux-x86_64.zip && \
+      unzip protoc-21.12-linux-x86_64.zip -d protoc && \
+      chmod +x protoc/bin/protoc && \
+      mv protoc/bin/protoc /usr/local/bin/protoc
+    - gem sources --remove https://rubygems.org/
+    - gem sources --add ${RUBYGEMS_PUBLIC_SOURCE}
     - gem install bundler -v 2.4.22
     - bin/setup
   script:

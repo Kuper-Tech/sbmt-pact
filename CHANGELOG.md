@@ -15,6 +15,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.12.1] - 2024-12-12
+
+### Changed
+- replaced localhost to 127.0.0.1 for provider tests
+
+## [0.12.0] - 2024-09-11
+
+# Changed
+- remove internal deps
+
 ## [0.11.1] - 2024-08-22
 
 ### Fixed

@@ -12,6 +12,8 @@ module Sbmt
         CONTENT_TYPE = "application/protobuf"
         GRPC_CONTENT_TYPE = "application/grpc"
         PROTOBUF_PLUGIN_NAME = "protobuf"
+
+        # see .gitlab-ci.yml before changing plugin version
         PROTOBUF_PLUGIN_VERSION = "0.4.0"
 
         class PluginInitError < Sbmt::Pact::FfiError; end
