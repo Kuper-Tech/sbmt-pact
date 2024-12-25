@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+## [0.12.2] - 2024-12-25
+
+### Changed
+- update `pact-ffi` to 0.4.26
+
 ## [0.12.1] - 2024-12-12
 
 ### Changed
