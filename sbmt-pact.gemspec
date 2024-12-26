@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "zeitwerk", "~> 2.3"
-  spec.add_dependency "pact-ffi", "~> 0.4.22"
+  spec.add_dependency "pact-ffi", "~> 0.4.26"
   spec.add_dependency "rack", "~> 2.0"
   spec.add_dependency "webrick"
   spec.add_dependency "rack-proxy"
